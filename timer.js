@@ -65,8 +65,8 @@ export function validateSettings(input) {
 
 export function badge(state, now = Date.now()) {
   const t = state.timer;
-  if (!t) return { text: state.lastCompletion ? '✓' : '', color: '#39745D', title: `Pomelo · Click to start ${LABELS[state.nextPhase].toLowerCase()}. Right-click for stats.` };
+  if (!t) return { text: state.lastCompletion ? '✓' : '', color: '#39745D', title: `Chromodoro · Click to start ${LABELS[state.nextPhase].toLowerCase()}. Right-click for stats.` };
   const minutes = Math.max(1, Math.ceil(remainingMs(t, now) / 60000));
   const paused = t.status === 'paused';
-  return { text: `${minutes}m`, color: paused ? '#77736B' : t.phase === 'focus' ? '#C34F35' : '#39745D', title: `Pomelo · ${LABELS[t.phase]} · ${minutes} min left${paused ? ' (paused)' : ''}. Click to ${paused ? 'resume' : 'pause'}. Right-click for stats.` };
+  return { text: `${minutes}m`, color: paused ? '#77736B' : t.phase === 'focus' ? '#C34F35' : '#39745D', title: `Chromodoro · ${LABELS[t.phase]} · ${minutes} min left${paused ? ' (paused)' : ''}. Click to ${paused ? 'resume' : 'pause'}. Right-click for stats.` };
 }

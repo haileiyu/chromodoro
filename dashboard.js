@@ -56,7 +56,7 @@ function renderTimer() {
     button.setAttribute('aria-pressed', String(button.dataset.phase === phase));
     button.disabled = !!t;
   });
-  document.title = t ? `${$('countdown').textContent}${paused ? ' · Paused' : ''} · Pomelo` : 'Pomelo · Your focus, day by day';
+  document.title = t ? `${$('countdown').textContent}${paused ? ' · Paused' : ''} · Chromodoro` : 'Chromodoro · Your focus, day by day';
   if (t?.status === 'running' && ms === 0 && !reconciling) {
     reconciling = true;
     request('get').catch(report).finally(() => { reconciling = false; });
@@ -184,7 +184,7 @@ $('export').addEventListener('click', async () => {
     const url = URL.createObjectURL(new Blob([rows.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8;' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `pomelo-history-${dayKey()}.csv`;
+    a.download = `chromodoro-history-${dayKey()}.csv`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (error) { report(error); }

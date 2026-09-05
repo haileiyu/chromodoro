@@ -1,14 +1,14 @@
-# Pomelo — Pomodoro Timer
+# Chromodoro — Pomodoro Timer
 
 A small, dependency-free Chrome extension with a one-click toolbar timer and private daily stats. Original implementation inspired by the simplicity of classic Pomodoro extensions.
 
 ## Install in Chrome
 
-1. Unzip `pomelo-chrome-extension.zip` into a folder you will keep, such as `Documents/Extensions`.
+1. Download this repository (**Code → Download ZIP**, then unzip) or `git clone` it into a folder you will keep, such as `Documents/Extensions`.
 2. Enter `chrome://extensions` in Chrome’s address bar.
 3. Turn on **Developer mode** at the top right.
-4. Click **Load unpacked** and select the `pomelo` folder containing `manifest.json`.
-5. Open Chrome’s puzzle-piece **Extensions** menu and pin **Pomelo — Pomodoro Timer**.
+4. Click **Load unpacked** and select the `chromodoro` folder containing `manifest.json`.
+5. Open Chrome’s puzzle-piece **Extensions** menu and pin **Chromodoro — Pomodoro Timer**.
 
 No build, npm install, account, or server is needed. Keep the folder in place: Chrome loads the extension from it. To update the code later, replace files in the same folder and click Reload on its Chrome extensions card. Do not uninstall to update if you want to retain stats. A managed work Chrome profile may restrict unpacked extensions; use a personal Chrome profile if needed.
 

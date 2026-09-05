@@ -45,9 +45,9 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     let result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.status, 'running');
     assert.equal(h.badge.text, '25m');
-    assert.equal(h.alarms.get('pomelo-tick').periodInMinutes, 0.5);
+    assert.equal(h.alarms.get('chromodoro-tick').periodInMinutes, 0.5);
     now += 9 * 60000;
-    h.chrome.alarms.onAlarm.fire({ name: 'pomelo-tick' });
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-tick' });
     await h.message({ type: 'get' });
     assert.equal(h.badge.text, '16m');
     h.chrome.action.onClicked.fire();
@@ -63,17 +63,17 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     assert.equal(result.state.timer.remainingMs, 16 * 60000);
     h.chrome.action.onClicked.fire();
     result = await h.message({ type: 'get' });
-    assert.equal(h.alarms.get('pomelo-end').scheduledTime, now + 16 * 60000);
+    assert.equal(h.alarms.get('chromodoro-end').scheduledTime, now + 16 * 60000);
     const deadline = result.state.timer.endsAt;
     // Simulate a suspended worker plus cleared alarms while still running.
     h = chromeHarness(h.persisted);
     globalThis.chrome = h.chrome;
     await import(`../background.js?third=${Math.random()}`);
     await h.message({ type: 'get' });
-    assert.equal(h.alarms.get('pomelo-end').scheduledTime, deadline);
+    assert.equal(h.alarms.get('chromodoro-end').scheduledTime, deadline);
     now = deadline;
-    h.chrome.alarms.onAlarm.fire({ name: 'pomelo-end' });
-    h.chrome.alarms.onAlarm.fire({ name: 'pomelo-tick' });
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-tick' });
     const simultaneous = await Promise.all([h.message({ type: 'get' }), h.message({ type: 'get' })]);
     assert.equal(simultaneous[1].state.days[dayKey(now)].count, 1);
     assert.equal(h.notifications.length, 1);

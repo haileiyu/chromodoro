@@ -1,13 +1,13 @@
 import { initialState, settle, toggle, badge, validateSettings, LABELS } from './timer.js';
 
-const END = 'pomelo-end';
-const TICK = 'pomelo-tick';
+const END = 'chromodoro-end';
+const TICK = 'chromodoro-tick';
 let queue = Promise.resolve();
 
 // Serialize read/modify/write across toolbar clicks, alarms, and settings tabs.
 function enqueue(task) {
   const result = queue.then(task);
-  queue = result.catch(error => console.error('Pomelo:', error));
+  queue = result.catch(error => console.error('Chromodoro:', error));
   return result;
 }
 
@@ -40,10 +40,10 @@ async function transact(action) {
   await syncChrome(state);
   if (completion && state.settings.notifications) {
     try {
-      await chrome.notifications.create(`pomelo-${completion.id}`, {
+      await chrome.notifications.create(`chromodoro-${completion.id}`, {
         type: 'basic', iconUrl: 'icons/icon128.png',
         title: completion.phase === 'focus' ? 'One Pomodoro, nicely done.' : 'Break complete. Ready when you are.',
-        message: completion.phase === 'focus' ? 'Your focus session is saved. Click the Pomelo icon to start your break.' : 'Click the Pomelo icon to start your next focus session.'
+        message: completion.phase === 'focus' ? 'Your focus session is saved. Click the Chromodoro icon to start your break.' : 'Click the Chromodoro icon to start your next focus session.'
       });
     } catch (error) { console.warn('Notification unavailable:', error); }
   }
@@ -75,7 +75,7 @@ chrome.contextMenus.onClicked.addListener(info => {
   if (info.menuItemId === 'reset') void run(reset);
 });
 chrome.notifications.onClicked.addListener(id => {
-  if (id.startsWith('pomelo-')) void chrome.runtime.openOptionsPage();
+  if (id.startsWith('chromodoro-')) void chrome.runtime.openOptionsPage();
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
