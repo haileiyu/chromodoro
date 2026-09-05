@@ -125,9 +125,9 @@ test('start focus now skips a queued or running break and leaves the long-break 
     let result = await finishFocus();
     assert.equal(result.state.nextPhase, 'shortBreak');
 
-    // One action replaces the queued break with a running focus session.
-    result = await h.message({ type: 'startFocus' });
-    assert.equal(result.ok, true);
+    // One right-click replaces the queued break with a running focus session.
+    h.chrome.contextMenus.onClicked.fire({ menuItemId: 'startFocus' });
+    result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.phase, 'focus');
     assert.equal(result.state.timer.status, 'running');
     assert.equal(result.state.lastCompletion, null);
