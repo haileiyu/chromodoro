@@ -119,7 +119,7 @@ test('version 1 settings.notifications migrates to the notify and newTab flags',
     const migrated = migrate(legacy(on));
     assert.equal(migrated.version, 2);
     assert.equal(migrated.settings.notify, on);
-    assert.equal(migrated.settings.newTab, false);
+    assert.equal(migrated.settings.newTab, on);
     assert.ok(!('notifications' in migrated.settings));
     assert.deepEqual(validateSettings(migrated.settings), migrated.settings);
   }
@@ -127,5 +127,5 @@ test('version 1 settings.notifications migrates to the notify and newTab flags',
   const kept = migrate({ version: 2, settings: { ...DEFAULTS, notify: false, newTab: true } });
   assert.deepEqual([kept.settings.notify, kept.settings.newTab], [false, true]);
   assert.equal(migrate({ version: 2, settings: { ...DEFAULTS, notify: 'yes' } }).settings.notify, true);
-  assert.equal(migrate({ version: 2, settings: { focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4 } }).settings.newTab, false);
+  assert.equal(migrate({ version: 2, settings: { focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4 } }).settings.newTab, true);
 });

@@ -189,7 +189,7 @@ test('the notification and new tab alerts are independent settings', async () =>
     await import(`../background.js?alerts=${Math.random()}`);
     h.chrome.runtime.onInstalled.fire();
     const base = (await h.message({ type: 'get' })).state.settings;
-    assert.deepEqual([base.notify, base.newTab], [true, false]);
+    assert.deepEqual([base.notify, base.newTab], [true, true]);
 
     await setAlerts(base, false, true);
     await finish();

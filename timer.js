@@ -1,4 +1,4 @@
-export const DEFAULTS = Object.freeze({ focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, notify: true, newTab: false });
+export const DEFAULTS = Object.freeze({ focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, notify: true, newTab: true });
 export const ALERTS = Object.freeze(['notify', 'newTab']);
 export const LABELS = Object.freeze({ focus: 'Focus', shortBreak: 'Short break', longBreak: 'Long break' });
 
@@ -40,6 +40,9 @@ export function migrate(state) {
   const settings = state.settings;
   if (typeof settings.notifications === 'boolean') {
     settings.notify = settings.notifications;
+    // The tab is the channel the OS cannot suppress, so switch it on for anyone who
+    // wanted to be told. An install that deliberately silenced alerts stays silent.
+    settings.newTab = settings.notifications;
     delete settings.notifications;
   }
   for (const key of ALERTS) if (typeof settings[key] !== 'boolean') settings[key] = DEFAULTS[key];
