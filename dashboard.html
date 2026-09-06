@@ -3,37 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chromodoro · Your focus, day by day</title>
+  <title>Chromodoro</title>
   <link rel="icon" href="icons/icon32.png">
   <link rel="stylesheet" href="dashboard.css">
   <script type="module" src="dashboard.js"></script>
 </head>
 <body>
-  <header class="header"><a class="brand" href="dashboard.html"><img src="icons/icon48.png" width="32" height="32" alt=""><span>chromodoro<span class="brand-dot">.</span></span></a><span class="header-note">A little focus goes a long way.</span><a href="#settings" class="settings-link">Settings <span aria-hidden="true">↗</span></a></header>
   <main>
-    <div class="intro"><p class="eyebrow" id="today-label">YOUR FOCUS SPACE</p><h1>One thing at a time.</h1><p>Make room for the work that matters. Then take a breath.</p></div>
-    <div class="layout">
-      <aside>
-        <section class="timer-card" aria-label="Pomodoro timer">
-          <div class="card-top"><span class="eyebrow">RIGHT NOW</span><span class="status" id="status" role="status">Ready</span></div>
-          <div class="phase-picker" role="group" aria-label="Session type"><button data-phase="focus" aria-pressed="true">Focus</button><button data-phase="shortBreak" aria-pressed="false">Short break</button><button data-phase="longBreak" aria-pressed="false">Long break</button></div>
-          <div class="dial" id="dial"><div class="dial-inner"><span id="timer-label">Time to focus</span><div id="countdown" role="timer" aria-label="Remaining time">25:00</div><span id="timer-caption">A fresh start, whenever you’re ready.</span></div></div>
-          <button id="toggle" class="primary wide" disabled>Start focus <span aria-hidden="true">↗</span></button>
-          <button id="reset" class="text-button wide" disabled>Reset session</button>
-          <div class="cycle"><div id="cycle-dots" aria-label="Progress toward long break"></div><span id="cycle-label">Long break after 4 Pomodoros</span></div>
-        </section>
-        <div class="tip"><span class="tip-mark" aria-hidden="true">↖</span><div><strong>Your timer lives in the toolbar.</strong><p>Pin Chromodoro in Chrome. Click once to start, again to pause. Right-click for this page.</p><div class="badge-demo"><span>16m</span><span>15m</span><span>…</span><span>1m</span><small>Minutes left, at a glance.</small></div></div></div>
-      </aside>
-      <div class="stats-column">
-        <div class="section-heading"><h2>Your focus, day by day</h2><span class="local-note"><span aria-hidden="true">●</span> Stored on this device</span></div>
-        <div class="metrics"><article><span>Today</span><strong id="today-count">0</strong><small id="today-minutes">0 min of focus</small></article><article><span>Last 7 days</span><strong id="week-count">0</strong><small>completed Pomodoros</small></article><article><span>All time</span><strong id="total-count">0</strong><small id="total-minutes">0 min of focus</small></article></div>
-        <section class="card activity"><div class="card-top"><h3>This week’s rhythm</h3><span id="week-range" class="muted"></span></div><div class="chart" id="chart" aria-label="Completed Pomodoros in the last seven days"></div><p id="chart-caption" class="chart-caption">Your first Pomodoro is a good place to start.</p></section>
-        <section class="card heatmap"><div class="card-top"><h3>Your year in focus</h3><span id="heat-range" class="muted"></span></div><div class="heat-scroll" id="heat-scroll"><div class="heat-months" id="heat-months" aria-hidden="true"></div><div class="heat-grid" id="heat-grid" role="grid" aria-label="Completed Pomodoros by day over the last year. Use the arrow keys to move between days."></div></div><div class="heat-foot"><span id="heat-total" class="muted"></span><span class="heat-legend" aria-hidden="true">Less<i class="sq"></i><i class="sq l1"></i><i class="sq l2"></i><i class="sq l3"></i><i class="sq l4"></i>More</span></div></section><section class="card history"><div class="card-top"><h3>Daily history</h3><div class="history-actions"><label class="sr-only" for="history-month">History month</label><input type="month" id="history-month"><button id="export" class="small-button">Export CSV <span aria-hidden="true">↓</span></button></div></div><div class="table-scroll"><table><thead><tr><th scope="col">Day</th><th scope="col">Pomodoros</th><th scope="col">Focus time</th></tr></thead><tbody id="history-body"></tbody></table></div><p class="footnote">Only finished focus sessions count. Pauses and breaks don’t add to your totals.</p></section>
+    <header class="header"><img src="icons/icon48.png" width="26" height="26" alt=""><span class="brand">chromodoro<span class="brand-dot">.</span></span></header>
+    <section class="card heat-card">
+      <div class="card-top"><span id="heat-range" class="muted"></span><button id="export" class="small-button">CSV <span aria-hidden="true">↓</span></button></div>
+      <div class="heat-scroll" id="heat-scroll">
+        <div class="heat-months" id="heat-months" aria-hidden="true"></div>
+        <div class="heat-grid" id="heat-grid" role="grid" aria-label="Completed Pomodoros by day over the last year. Use the arrow keys to move between days."></div>
       </div>
-    </div>
-    <section id="settings" class="card settings-card"><div><p class="eyebrow">MAKE IT YOURS</p><h2>A rhythm that fits you.</h2><p class="muted">New durations apply to your next session.<br>Start each focus session and break when you’re ready.</p></div><form id="settings-form"><div class="settings-grid"><label>Focus <span class="input-wrap"><input name="focus" type="number" min="1" max="180" required value="25"><span>min</span></span></label><label>Short break <span class="input-wrap"><input name="shortBreak" type="number" min="1" max="60" required value="5"><span>min</span></span></label><label>Long break <span class="input-wrap"><input name="longBreak" type="number" min="1" max="90" required value="15"><span>min</span></span></label><label>Long break every <span class="input-wrap"><input name="longEvery" type="number" min="1" max="12" required value="4"><span>sessions</span></span></label></div><div class="settings-bottom"><label class="checkbox"><input type="checkbox" name="notifications" checked> Notify me when a session ends</label><button type="submit" class="small-button save">Save settings</button></div><p id="save-status" role="status" class="save-status"></p></form></section>
+      <div class="heat-foot"><span id="heat-total" class="muted"></span><span class="heat-legend" aria-hidden="true">Less<i class="sq"></i><i class="sq l1"></i><i class="sq l2"></i><i class="sq l3"></i><i class="sq l4"></i>More</span></div>
+    </section>
+    <section class="card">
+      <form id="settings-form">
+        <div class="settings-grid">
+          <label>Focus <span class="input-wrap"><input name="focus" type="number" min="1" max="180" required value="25"><span>min</span></span></label>
+          <label>Short break <span class="input-wrap"><input name="shortBreak" type="number" min="1" max="60" required value="5"><span>min</span></span></label>
+          <label>Long break <span class="input-wrap"><input name="longBreak" type="number" min="1" max="90" required value="15"><span>min</span></span></label>
+          <label>Long break every <span class="input-wrap"><input name="longEvery" type="number" min="1" max="12" required value="4"><span>sessions</span></span></label>
+        </div>
+        <div class="settings-bottom">
+          <label class="checkbox"><input type="checkbox" name="notifications" checked> Notify me when a session ends</label>
+          <span class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button type="submit" class="small-button save">Save</button></span>
+        </div>
+      </form>
+    </section>
     <p id="error" role="alert" hidden></p>
-    <footer><span>Small sessions. Steady progress.</span><span>No account. No tracking. Just focus.</span></footer>
   </main>
 </body>
 </html>

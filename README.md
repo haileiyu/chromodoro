@@ -22,18 +22,17 @@ No build, npm install, account, or server is needed. Keep the folder in place: C
 | Look at the badge | Remaining rounded-up minutes, such as `16m`, `15m`, … `1m` |
 | Gray badge | Paused; minutes stay visible |
 | Green badge | Break running, or `✓` when a session finishes |
-| Right-click → **Stats & settings** | Open the timer dashboard, daily history, and settings |
+| Right-click → **Stats & settings** | Open your heatmap and settings |
 | Right-click → **Start focus now** | Skip the break and begin focusing immediately |
 | Right-click → **Reset timer** | Discard the current partial session and return to focus |
 
-The dashboard also has Start/Pause/Resume and Reset controls. **Reset session** discards partial progress without adding to your completed count. Select Focus, Short break, or Long break while idle. Alternatively, open **Details → Extension options** on Chrome’s extensions page.
+The timer lives entirely in the toolbar: the icon starts, pauses, and resumes, and the right-click menu skips a break or resets. The dashboard holds your heatmap and settings only. You can also open it from **Details → Extension options** on Chrome’s extensions page.
 
 Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break after every 4 completed focus sessions**. Every session starts manually. Finishing focus queues the next break; finishing a break queues focus. **Start focus now** skips that break in one click, whether it is queued or already running, and starts focusing right away; break time is never recorded, so nothing is lost. It is unavailable while a focus session is running, so it cannot discard one — use **Reset timer** for that. Skipping breaks does not disturb the long break owed after every fourth completed focus session. Settings affect future sessions, including after you reset; an already running or paused session keeps its duration.
 
 ## Stats and timing
 
-- Today, the last seven days, and all-time totals.
-- A seven-day activity chart and a month picker for daily history, including zero days through today.
+- A running total for the last year, shown above the heatmap.
 - A year-long heatmap of completed Pomodoros, one square per day in the style of a contribution graph. Shading uses fixed bands (1–2, 3–4, 5–6, 7 or more), so a shade means the same thing in every month. Days before your first recorded Pomodoro stay blank rather than showing as zeros. Hover a square for its total, or move between days with the arrow keys.
 - CSV export of all dates with completed focus sessions and their actual configured focus minutes.
 - Only completed focus sessions count; pauses, resets, and breaks do not.
@@ -52,7 +51,7 @@ Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break 
 - `manifest.json`: Chrome Manifest V3 configuration (Chrome 120+).
 - `background.js`: Chrome events, serialized storage updates, alarms, badge, and notifications.
 - `timer.js`: timer transitions, date keys, completion accounting, and settings validation.
-- `dashboard.html`, `dashboard.css`, `dashboard.js`: timer and statistics interface.
+- `dashboard.html`, `dashboard.css`, `dashboard.js`: heatmap and settings page.
 - `icons/`: bundled PNG toolbar icons.
 - `tests/`: timer and mocked Chrome API integration tests. Run `npm test` with Node 20+; no dependencies need installing.
 
