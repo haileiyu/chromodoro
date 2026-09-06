@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, toggle, settle, remainingMs, badge, dayKey, validateSettings, DEFAULTS } from '../timer.js';
+import { initialState, toggle, settle, remainingMs, badge, dayKey, validateSettings, DEFAULTS, heatmapDays, heatmapLevel, HEATMAP_WEEKS } from '../timer.js';
 
 test('badge rounds up: 16m, 15m, then 1m in the final minute', () => {
   const s = initialState();
@@ -74,4 +74,38 @@ test('rejects invalid settings including fractions and extreme durations', () =>
   }
   assert.throws(() => validateSettings({ ...DEFAULTS, notifications: 'yes' }));
   assert.deepEqual(validateSettings(DEFAULTS), DEFAULTS);
+});
+
+test('heatmap window is 53 whole Sunday-first weeks with no day skipped or repeated', () => {
+  // Anchored across the US autumn DST change, where naive 86400000ms stepping drifts.
+  const now = new Date(2026, 10, 4, 9).getTime();
+  const days = heatmapDays(now);
+  const keys = days.map(dayKey);
+  assert.equal(days.length, HEATMAP_WEEKS * 7);
+  assert.equal(days[0].getDay(), 0);
+  assert.equal(days.at(-1).getDay(), 6);
+  assert.ok(keys.includes(dayKey(now)));
+  assert.equal(new Set(keys).size, keys.length);
+  assert.deepEqual(keys, [...keys].sort());
+  // Distinct and ascending over an exact 370-day span leaves no room for a gap.
+  assert.equal(Math.round((days.at(-1) - days[0]) / 86400000), HEATMAP_WEEKS * 7 - 1);
+  for (const date of days) assert.equal(date.getHours(), 12);
+});
+
+test('heatmap columns are week-aligned: today advances daily, the window turns over on Sunday', () => {
+  const at = (day, hour) => heatmapDays(new Date(2026, 8, day, hour).getTime()).map(dayKey);
+  // Tue and Wed of one week share a window; only today's position inside it moves.
+  const tuesday = at(8, 10);
+  assert.deepEqual(tuesday, at(9, 10));
+  assert.equal(tuesday.indexOf('2026-09-09') - tuesday.indexOf('2026-09-08'), 1);
+  // Both are still in the final column, so a rebuild must reveal the newly past day.
+  assert.equal(tuesday.at(-1), '2026-09-12');
+  const saturday = at(12, 23);
+  const sunday = at(13, 0);
+  assert.notDeepEqual(saturday, sunday);
+  assert.equal(Math.round((new Date(`${sunday[0]}T12:00`) - new Date(`${saturday[0]}T12:00`)) / 86400000), 7);
+});
+
+test('heatmap levels are fixed buckets, not scaled to the busiest day', () => {
+  assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 40].map(heatmapLevel), [0, 1, 1, 2, 2, 3, 3, 4, 4]);
 });
