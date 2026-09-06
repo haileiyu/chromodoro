@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initialState, toggle, settle, remainingMs, badge, dayKey, validateSettings, DEFAULTS, heatmapDays, heatmapLevel, HEATMAP_WEEKS } from '../timer.js';
+import { initialState, toggle, settle, remainingMs, badge, dayKey, validateSettings, migrate, DEFAULTS, heatmapDays, heatmapLevel, HEATMAP_WEEKS } from '../timer.js';
 
 test('badge rounds up: 16m, 15m, then 1m in the final minute', () => {
   const s = initialState();
@@ -72,7 +72,10 @@ test('rejects invalid settings including fractions and extreme durations', () =>
   for (const value of [0, -1, 1.5, 181, 'invalid', Infinity]) {
     assert.throws(() => validateSettings({ ...DEFAULTS, focus: value }));
   }
-  assert.throws(() => validateSettings({ ...DEFAULTS, notifications: 'yes' }));
+  for (const key of ['notify', 'newTab']) {
+    assert.throws(() => validateSettings({ ...DEFAULTS, [key]: 'yes' }));
+    assert.throws(() => validateSettings({ ...DEFAULTS, [key]: undefined }));
+  }
   assert.deepEqual(validateSettings(DEFAULTS), DEFAULTS);
 });
 
@@ -108,4 +111,21 @@ test('heatmap columns are week-aligned: today advances daily, the window turns o
 
 test('heatmap levels are fixed buckets, not scaled to the busiest day', () => {
   assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 40].map(heatmapLevel), [0, 1, 1, 2, 2, 3, 3, 4, 4]);
+});
+
+test('version 1 settings.notifications migrates to the notify and newTab flags', () => {
+  const legacy = on => ({ version: 1, settings: { focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, notifications: on }, timer: null, nextPhase: 'focus', cycle: 0, days: {}, lastCompletion: null });
+  for (const on of [true, false]) {
+    const migrated = migrate(legacy(on));
+    assert.equal(migrated.version, 2);
+    assert.equal(migrated.settings.notify, on);
+    assert.equal(migrated.settings.newTab, false);
+    assert.ok(!('notifications' in migrated.settings));
+    assert.deepEqual(validateSettings(migrated.settings), migrated.settings);
+  }
+  // Already-migrated settings are left alone; a missing or broken flag falls back.
+  const kept = migrate({ version: 2, settings: { ...DEFAULTS, notify: false, newTab: true } });
+  assert.deepEqual([kept.settings.notify, kept.settings.newTab], [false, true]);
+  assert.equal(migrate({ version: 2, settings: { ...DEFAULTS, notify: 'yes' } }).settings.notify, true);
+  assert.equal(migrate({ version: 2, settings: { focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4 } }).settings.newTab, false);
 });

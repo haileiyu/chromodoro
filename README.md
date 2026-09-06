@@ -40,22 +40,25 @@ Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break 
 - Running timers use elapsed wall-clock time, including time while Chrome is closed or the computer is asleep. Pause before stepping away if you do not want that time to count. A paused timer stays paused across restarts.
 - Chrome alarms wake the timer and refresh the badge about every 30 seconds. Chrome may delay badge updates and notifications during sleep or resource throttling. The next wake reconciles the saved deadline and records at most one completion; it never auto-starts more sessions while you are away.
 - A session is assigned to the local calendar date of its scheduled completion, using the computer’s timezone when completion is processed. Historical date keys do not move if you later change timezones.
-- Completion notifications respect your Chrome and operating-system notification settings. Click a notification to open the dashboard.
+- When a session ends, Chromodoro can show a system notification, open a full-page tab, both, or neither. The two checkboxes under **When a session ends** are independent, so you can pick any combination. Notifications are on and the tab is off by default.
+- The tab shows what finished and offers to start the next session or skip straight to focus. It closes itself as soon as a session starts anywhere, including from the toolbar, so alerts never pile up as stray tabs.
+- Notifications respect your Chrome and operating-system notification settings; if macOS has notifications turned off for Chrome, nothing appears. The new tab does not depend on those settings, which makes it the reliable option. Click a notification to open the dashboard.
 
 ## Permissions
 
-`storage` saves settings and counts. `alarms` keeps the countdown working when the service worker sleeps. `contextMenus` supplies the icon’s right-click menu. `notifications` announces completion. No browsing, tabs, or website permissions are requested.
+`storage` saves settings and counts. `alarms` keeps the countdown working when the service worker sleeps. `contextMenus` supplies the icon’s right-click menu. `notifications` announces completion. No browsing or website permissions are requested. The end-of-session tab needs no `tabs` permission: opening a page of the extension’s own does not require one.
 
 ## Source and verification
 
 - `manifest.json`: Chrome Manifest V3 configuration (Chrome 120+).
-- `background.js`: Chrome events, serialized storage updates, alarms, badge, and notifications.
-- `timer.js`: timer transitions, date keys, completion accounting, and settings validation.
+- `background.js`: Chrome events, serialized storage updates, alarms, badge, and end-of-session alerts.
+- `timer.js`: timer transitions, date keys, completion accounting, settings validation, and stored-state migration.
 - `dashboard.html`, `dashboard.css`, `dashboard.js`: heatmap and settings page.
+- `alert.html`, `alert.js`: the end-of-session tab.
 - `icons/`: bundled PNG toolbar icons.
 - `tests/`: timer and mocked Chrome API integration tests. Run `npm test` with Node 20+; no dependencies need installing.
 
-The automated tests cover badge rounding, pause/resume, serialization, midnight completion, duplicate events, break cycles, settings, worker restart recovery, and simultaneous events. They simulate Chrome APIs; a local unpacked installation is the final check for real toolbar rendering and OS notifications.
+The automated tests cover badge rounding, pause/resume, serialization, midnight completion, duplicate events, break cycles, settings, worker restart recovery, simultaneous events, alert settings, and migration of pre-existing stored settings. They simulate Chrome APIs; a local unpacked installation is the final check for real toolbar rendering and OS notifications.
 
 For a quick manual check, set Focus to 1 minute, start it from the toolbar, pause and resume once, then let it finish. Expect `1m`, a gray badge while paused, one new Pomodoro in Today, and a completion notification if enabled. Restore your preferred duration afterward.
 

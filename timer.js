@@ -1,4 +1,5 @@
-export const DEFAULTS = Object.freeze({ focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, notifications: true });
+export const DEFAULTS = Object.freeze({ focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, notify: true, newTab: false });
+export const ALERTS = Object.freeze(['notify', 'newTab']);
 export const LABELS = Object.freeze({ focus: 'Focus', shortBreak: 'Short break', longBreak: 'Long break' });
 
 export function dayKey(time = Date.now()) {
@@ -29,7 +30,21 @@ export function heatmapLevel(count) {
 }
 
 export function initialState() {
-  return { version: 1, settings: { ...DEFAULTS }, timer: null, nextPhase: 'focus', cycle: 0, days: {}, lastCompletion: null };
+  return { version: 2, settings: { ...DEFAULTS }, timer: null, nextPhase: 'focus', cycle: 0, days: {}, lastCompletion: null };
+}
+
+// Version 1 stored settings.notifications as a boolean; version 2 replaced it with
+// settings.alert, which can also open a tab. Runs on every load, so an install that
+// never opens the settings page is still migrated.
+export function migrate(state) {
+  const settings = state.settings;
+  if (typeof settings.notifications === 'boolean') {
+    settings.notify = settings.notifications;
+    delete settings.notifications;
+  }
+  for (const key of ALERTS) if (typeof settings[key] !== 'boolean') settings[key] = DEFAULTS[key];
+  state.version = 2;
+  return state;
 }
 
 export function remainingMs(timer, now = Date.now()) {
@@ -42,7 +57,7 @@ export function remainingMs(timer, now = Date.now()) {
 export function settle(state, now = Date.now()) {
   const t = state.timer;
   if (!t || t.status !== 'running' || t.endsAt > now) return null;
-  const completion = { id: t.id, phase: t.phase, endedAt: t.endsAt };
+  const completion = { id: t.id, phase: t.phase, endedAt: t.endsAt, minutes: t.durationMs / 60000 };
   if (t.phase === 'focus') {
     const key = dayKey(t.endsAt);
     const day = state.days[key] ?? { count: 0, minutes: 0 };
@@ -80,8 +95,10 @@ export function validateSettings(input) {
     if (!Number.isInteger(n) || n < 1 || n > max) throw new Error(`${key} must be a whole number between 1 and ${max}.`);
     result[key] = n;
   }
-  if (typeof input.notifications !== 'boolean') throw new Error('Choose whether notifications are enabled.');
-  result.notifications = input.notifications;
+  for (const key of ALERTS) {
+    if (typeof input[key] !== 'boolean') throw new Error('Choose what happens when a session ends.');
+    result[key] = input[key];
+  }
   return result;
 }
 

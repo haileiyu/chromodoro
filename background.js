@@ -1,4 +1,4 @@
-import { initialState, settle, toggle, badge, validateSettings, LABELS } from './timer.js';
+import { initialState, migrate, settle, toggle, badge, validateSettings, LABELS } from './timer.js';
 
 const END = 'chromodoro-end';
 const TICK = 'chromodoro-tick';
@@ -41,22 +41,36 @@ async function transact(action) {
   const stored = await chrome.storage.local.get('state');
   const state = stored.state ?? initialState();
   const before = JSON.stringify(stored.state);
+  migrate(state);
   const completion = settle(state);
   // Save completion before an action that might fail validation.
   if (completion) await chrome.storage.local.set({ state });
   if (action) action(state);
   if (JSON.stringify(state) !== before) await chrome.storage.local.set({ state });
   await syncChrome(state);
-  if (completion && state.settings.notifications) {
+  if (completion) await announce(state, completion);
+  return state;
+}
+
+// Never let a failed alert take the timer down with it: the session is already banked.
+async function announce(state, completion) {
+  const focus = completion.phase === 'focus';
+  // Independent, so either can fail or be switched off without touching the other.
+  if (state.settings.notify) {
     try {
       await chrome.notifications.create(`chromodoro-${completion.id}`, {
         type: 'basic', iconUrl: 'icons/icon128.png',
-        title: completion.phase === 'focus' ? 'One Pomodoro, nicely done.' : 'Break complete. Ready when you are.',
-        message: completion.phase === 'focus' ? 'Your focus session is saved. Click the Chromodoro icon to start your break.' : 'Click the Chromodoro icon to start your next focus session.'
+        title: focus ? 'One Pomodoro, nicely done.' : 'Break complete. Ready when you are.',
+        message: focus ? 'Your focus session is saved. Click the Chromodoro icon to start your break.' : 'Click the Chromodoro icon to start your next focus session.'
       });
     } catch (error) { console.warn('Notification unavailable:', error); }
   }
-  return state;
+  if (state.settings.newTab) {
+    try {
+      // chrome.tabs.create needs no "tabs" permission for an extension page of our own.
+      await chrome.tabs.create({ url: chrome.runtime.getURL('alert.html'), active: true });
+    } catch (error) { console.warn('Alert tab unavailable:', error); }
+  }
 }
 
 async function setupMenus() {

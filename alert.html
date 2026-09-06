@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chromodoro</title>
+  <link rel="icon" href="icons/icon32.png">
+  <style>
+    :root{color-scheme:light;--bg:#f7f6f2;--paper:#fffefa;--text:#2c302b;--muted:#76796f;--line:#e6e5dd;--accent:#bb513b;--green:#39745d;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text)}
+    main{text-align:center;padding:24px}
+    img{width:56px;height:56px}
+    h1{font-family:Georgia,serif;font-weight:400;font-size:40px;letter-spacing:-1.4px;margin:22px 0 10px}
+    p{color:var(--muted);font-size:13px;margin:0 0 34px}
+    .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    button{font:inherit;cursor:pointer;border-radius:9px;padding:14px 26px;font-size:14px;font-weight:550;outline-offset:4px}
+    button:focus-visible{outline:2px solid var(--accent)}
+    button:disabled{cursor:default;opacity:.48}
+    .primary{background:var(--accent);color:#fff;border:0}.primary:hover{background:#a64632}
+    .primary.break{background:var(--green)}.primary.break:hover{background:#2e6150}
+    .secondary{background:transparent;border:1px solid var(--line);color:var(--text)}.secondary:hover{background:var(--paper)}
+  </style>
+  <script type="module" src="alert.js"></script>
+</head>
+<body>
+  <main>
+    <img src="icons/icon128.png" alt="">
+    <h1 id="headline">Session complete</h1>
+    <p id="detail"></p>
+    <div class="actions">
+      <button id="primary" class="primary" disabled></button>
+      <button id="secondary" class="secondary" hidden>Skip to focus</button>
+    </div>
+  </main>
+</body>
+</html>

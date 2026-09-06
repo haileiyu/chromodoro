@@ -9,6 +9,7 @@ function chromeHarness(persisted = {}) {
   const notifications = [];
   const badge = {};
   const menus = new Map();
+  const tabs = [];
   const chrome = {
     storage: { local: {
       async get(key) { return { [key]: structuredClone(persisted[key]) }; },
@@ -29,10 +30,11 @@ function chromeHarness(persisted = {}) {
       // Real Chrome sets lastError for an unknown id; the callback still runs.
       update(id, props, callback) { if (menus.has(id)) Object.assign(menus.get(id), props); callback(); }
     },
-    runtime: { id: 'test-extension', onInstalled: event(), onStartup: event(), onMessage: event(), async openOptionsPage() {} }
+    tabs: { async create(properties) { tabs.push(properties); return { id: tabs.length }; } },
+    runtime: { id: 'test-extension', getURL: path => `chrome-extension://test/${path}`, onInstalled: event(), onStartup: event(), onMessage: event(), async openOptionsPage() {} }
   };
   const message = data => new Promise(resolve => chrome.runtime.onMessage.listeners[0](data, { id: chrome.runtime.id }, resolve));
-  return { chrome, persisted, alarms, notifications, badge, menus, message };
+  return { chrome, persisted, alarms, notifications, badge, menus, tabs, message };
 }
 
 test('toolbar, restart recovery, concurrent alarms, reset, and settings integration', async () => {
@@ -164,6 +166,49 @@ test('start focus now skips a queued or running break and leaves the long-break 
     assert.equal(result.state.nextPhase, 'longBreak');
     assert.equal(result.state.days[dayKey(now)].count, 4);
     assert.equal(h.menus.get('startFocus').enabled, true);
+  } finally {
+    Date.now = realNow;
+    delete globalThis.chrome;
+  }
+});
+
+test('the notification and new tab alerts are independent settings', async () => {
+  const realNow = Date.now;
+  let now = new Date(2026, 8, 6, 9).getTime();
+  Date.now = () => now;
+  const h = chromeHarness();
+  globalThis.chrome = h.chrome;
+  const finish = async () => {
+    await h.message({ type: 'toggle' });
+    now = (await h.message({ type: 'get' })).state.timer.endsAt;
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
+    return h.message({ type: 'get' });
+  };
+  const setAlerts = (base, notify, newTab) => h.message({ type: 'settings', settings: { ...base, notify, newTab } });
+  try {
+    await import(`../background.js?alerts=${Math.random()}`);
+    h.chrome.runtime.onInstalled.fire();
+    const base = (await h.message({ type: 'get' })).state.settings;
+    assert.deepEqual([base.notify, base.newTab], [true, false]);
+
+    await setAlerts(base, false, true);
+    await finish();
+    assert.equal(h.tabs.length, 1);
+    assert.equal(h.notifications.length, 0);
+    assert.match(h.tabs[0].url, /alert\.html$/);
+    assert.equal(h.tabs[0].active, true);
+
+    await setAlerts(base, true, true);
+    await finish();
+    assert.equal(h.tabs.length, 2);
+    assert.equal(h.notifications.length, 1);
+
+    await setAlerts(base, false, false);
+    const quiet = await finish();
+    assert.equal(h.tabs.length, 2);
+    assert.equal(h.notifications.length, 1);
+    // Silence is only about the alert: the Pomodoro itself is still banked.
+    assert.equal(quiet.state.days[dayKey(now)].count, 2);
   } finally {
     Date.now = realNow;
     delete globalThis.chrome;

@@ -1,4 +1,4 @@
-import { dayKey, heatmapDays, heatmapLevel } from './timer.js';
+import { dayKey, heatmapDays, heatmapLevel, ALERTS } from './timer.js';
 
 const $ = id => document.getElementById(id);
 const form = $('settings-form');
@@ -123,7 +123,7 @@ function render() {
   renderHeatmap();
   if (!formInitialized) {
     for (const [key, value] of Object.entries(state.settings)) {
-      if (key === 'notifications') form.elements[key].checked = value;
+      if (typeof value === 'boolean') form.elements[key].checked = value;
       else form.elements[key].value = value;
     }
     formInitialized = true;
@@ -147,7 +147,7 @@ $('heat-grid').addEventListener('keydown', event => {
 form.addEventListener('submit', async event => {
   event.preventDefault();
   const settings = Object.fromEntries(['focus', 'shortBreak', 'longBreak', 'longEvery'].map(key => [key, Number(form.elements[key].value)]));
-  settings.notifications = form.elements.notifications.checked;
+  for (const key of ALERTS) settings[key] = form.elements[key].checked;
   const button = form.querySelector('[type=submit]');
   button.disabled = true;
   try {
