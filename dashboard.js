@@ -1,4 +1,4 @@
-import { dayKey, remainingMs, LABELS } from './timer.js';
+import { dayKey, remainingMs, LABELS, heatmapDays, heatmapLevel } from './timer.js';
 
 const $ = id => document.getElementById(id);
 const form = $('settings-form');
@@ -6,6 +6,9 @@ let state;
 let formInitialized = false;
 let lastDate = dayKey();
 let reconciling = false;
+let heatBuiltFor = null;
+let heatCells = [];
+let heatDates = [];
 
 function report(error) {
   $('error').textContent = error.message || String(error);
@@ -19,6 +22,10 @@ async function request(type, payload = {}) {
   state = response.state;
   render();
   return state;
+}
+
+function monthLabel(date) {
+  return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
 }
 
 function minutesLabel(value) {
@@ -110,7 +117,98 @@ function renderStats() {
   }));
   $('cycle-dots').setAttribute('aria-label', `${cycleDone} of ${cycleTotal} Pomodoros toward a long break`);
   $('cycle-label').textContent = `Long break after ${cycleTotal} Pomodoro${cycleTotal === 1 ? '' : 's'}`;
+  renderHeatmap();
   renderHistory();
+}
+
+// Rebuilt only when the window moves at midnight; updates in place otherwise, so a
+// 30-second tick neither churns 371 nodes nor throws away scroll or keyboard position.
+function buildHeatmap() {
+  const days = heatmapDays();
+  const today = dayKey();
+  const months = [];
+  let previous = -1;
+  for (let week = 0; week * 7 < days.length; week++) {
+    const sunday = days[week * 7];
+    if (sunday.getMonth() === previous) continue;
+    previous = sunday.getMonth();
+    // A window opening mid-month would stack a sliver label on the next month's.
+    if (week === 0 && sunday.getDate() > 1) continue;
+    const label = document.createElement('span');
+    label.style.gridColumn = `${week + 2} / span ${Math.min(5, 53 - week)}`;
+    label.textContent = sunday.toLocaleDateString(undefined, { month: 'short' });
+    months.push(label);
+  }
+  $('heat-months').replaceChildren(...months);
+  const rows = Array.from({ length: 7 }, (_, weekday) => {
+    const row = document.createElement('div');
+    row.className = 'heat-row';
+    row.setAttribute('role', 'row');
+    if (weekday % 2) {
+      const name = document.createElement('span');
+      name.className = 'heat-day';
+      name.style.gridRow = weekday + 1;
+      name.textContent = days[weekday].toLocaleDateString(undefined, { weekday: 'short' });
+      name.setAttribute('aria-hidden', 'true');
+      row.append(name);
+    }
+    return row;
+  });
+  heatCells = days.map((date, i) => {
+    if (dayKey(date) > today) return null;
+    const cell = document.createElement('div');
+    cell.className = 'sq';
+    cell.style.gridColumn = Math.floor(i / 7) + 2;
+    cell.style.gridRow = i % 7 + 1;
+    cell.dataset.index = i;
+    rows[i % 7].append(cell);
+    return cell;
+  });
+  heatDates = days;
+  $('heat-grid').replaceChildren(...rows);
+  $('heat-range').textContent = `${monthLabel(days[0])} – ${monthLabel(new Date())}`;
+  heatBuiltFor = today;
+  $('heat-scroll').scrollLeft = $('heat-scroll').scrollWidth;
+}
+
+function renderHeatmap() {
+  if (heatBuiltFor !== dayKey()) buildHeatmap();
+  // Days before the first recorded one stay blank: a new install should not open on a
+  // year of misses, and those squares are not data a screen reader should walk through.
+  const [first] = Object.keys(state.days).sort();
+  const anchor = heatCells.find(cell => cell?.tabIndex === 0 && !cell.hasAttribute('aria-hidden'));
+  let total = 0;
+  let latest = null;
+  heatCells.forEach((cell, i) => {
+    if (!cell) return;
+    const key = dayKey(heatDates[i]);
+    const day = state.days[key];
+    const count = day?.count ?? 0;
+    total += count;
+    if (!first || key < first) {
+      cell.className = 'sq pre';
+      cell.setAttribute('aria-hidden', 'true');
+      for (const attribute of ['role', 'tabindex', 'title', 'aria-label']) cell.removeAttribute(attribute);
+      return;
+    }
+    const when = heatDates[i].toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const label = count
+      ? `${when} — ${count} Pomodoro${count === 1 ? '' : 's'} · ${minutesLabel(day.minutes)} of focus`
+      : `${when} — no Pomodoros`;
+    cell.className = `sq l${heatmapLevel(count)}`;
+    cell.removeAttribute('aria-hidden');
+    cell.setAttribute('role', 'gridcell');
+    cell.setAttribute('title', label);
+    cell.setAttribute('aria-label', label);
+    cell.tabIndex = -1;
+    latest = cell;
+  });
+  // One tab stop, arrow keys inside. Keep wherever the user already is.
+  const stop = anchor && !anchor.hasAttribute('aria-hidden') ? anchor : latest;
+  if (stop) stop.tabIndex = 0;
+  $('heat-total').textContent = total
+    ? `${total} Pomodoro${total === 1 ? '' : 's'} in the last year`
+    : 'Your first Pomodoro will show up here.';
 }
 
 function renderHistory() {
@@ -162,6 +260,20 @@ async function handleAction(button, type, payload) {
 $('toggle').addEventListener('click', () => handleAction($('toggle'), 'toggle'));
 $('reset').addEventListener('click', () => handleAction($('reset'), 'reset'));
 document.querySelectorAll('[data-phase]').forEach(button => button.addEventListener('click', () => handleAction(button, 'phase', { phase: button.dataset.phase })));
+$('heat-grid').addEventListener('keydown', event => {
+  const step = { ArrowLeft: -7, ArrowRight: 7, ArrowUp: -1, ArrowDown: 1 }[event.key];
+  const from = Number(document.activeElement?.dataset?.index);
+  if (!step || !Number.isInteger(from)) return;
+  const to = from + step;
+  // Vertical moves stay inside their week; horizontal moves stay on the same weekday.
+  if (Math.abs(step) === 1 && Math.floor(to / 7) !== Math.floor(from / 7)) return;
+  const target = heatCells[to];
+  if (!target || target.hasAttribute('aria-hidden')) return;
+  event.preventDefault();
+  document.activeElement.tabIndex = -1;
+  target.tabIndex = 0;
+  target.focus();
+});
 $('history-month').value = dayKey().slice(0, 7);
 $('history-month').max = dayKey().slice(0, 7);
 $('history-month').addEventListener('change', renderHistory);

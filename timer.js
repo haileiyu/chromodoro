@@ -6,6 +6,28 @@ export function dayKey(time = Date.now()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+export const HEATMAP_WEEKS = 53;
+
+// Sunday-first columns ending with the week containing `now`. Dates are built by
+// mutating a noon anchor, so a DST shift can never skip or repeat a day.
+export function heatmapDays(now = Date.now(), weeks = HEATMAP_WEEKS) {
+  const anchor = new Date(now);
+  anchor.setHours(12, 0, 0, 0);
+  anchor.setDate(anchor.getDate() - anchor.getDay() - (weeks - 1) * 7);
+  const start = anchor.getDate();
+  return Array.from({ length: weeks * 7 }, (_, i) => {
+    const date = new Date(anchor);
+    date.setDate(start + i);
+    return date;
+  });
+}
+
+// Fixed buckets, not quartiles of the user's own max: a Pomodoro is a fixed unit
+// of work, so a shade means the same thing in every month and for every user.
+export function heatmapLevel(count) {
+  return count ? (count <= 2 ? 1 : count <= 4 ? 2 : count <= 6 ? 3 : 4) : 0;
+}
+
 export function initialState() {
   return { version: 1, settings: { ...DEFAULTS }, timer: null, nextPhase: 'focus', cycle: 0, days: {}, lastCompletion: null };
 }
