@@ -66,7 +66,7 @@ async function announce(state, completion) {
 
 async function setupMenus() {
   await chrome.contextMenus.removeAll();
-  for (const [id, title] of [['startFocus', 'Start focusing'], ['startBreak', 'Start break'], ['dashboard', 'Pomodoro history']]) {
+  for (const [id, title] of [['startFocus', 'Start focusing'], ['startBreak', 'Start break'], ['history', 'Pomodoro history']]) {
     await new Promise((resolve, reject) => {
       chrome.contextMenus.create({ id, title, contexts: ['action'] }, () => {
         const error = chrome.runtime.lastError;
@@ -93,6 +93,9 @@ const startBreak = state => {
   toggle(state);
 };
 const run = action => enqueue(() => transact(action));
+// Settings are the options page, which Chrome lists as Options in this same menu;
+// history is its own page so the two items do not open the same thing.
+const openHistory = () => chrome.tabs.create({ url: chrome.runtime.getURL('history.html') });
 
 chrome.action.onClicked.addListener(() => { void run(state => toggle(state)); });
 chrome.alarms.onAlarm.addListener(alarm => { if ([END, TICK].includes(alarm.name)) void run(); });
@@ -101,10 +104,10 @@ chrome.runtime.onStartup.addListener(() => { void enqueue(async () => { await se
 chrome.contextMenus.onClicked.addListener(info => {
   if (info.menuItemId === 'startFocus') void run(startFocus);
   if (info.menuItemId === 'startBreak') void run(startBreak);
-  if (info.menuItemId === 'dashboard') void chrome.runtime.openOptionsPage();
+  if (info.menuItemId === 'history') void openHistory();
 });
 chrome.notifications.onClicked.addListener(id => {
-  if (id.startsWith('chromodoro-')) void chrome.runtime.openOptionsPage();
+  if (id.startsWith('chromodoro-')) void openHistory();
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;

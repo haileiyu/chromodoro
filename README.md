@@ -26,7 +26,7 @@ No build, npm install, account, or server is needed. Keep the folder in place: C
 | Right-click → **Start break** | Start the break that is due now, replacing whatever is running |
 | Right-click → **Pomodoro history** | Open your heatmap and settings |
 
-The timer lives entirely in the toolbar: the icon starts, pauses, and resumes, and the right-click menu jumps straight to focus or a break. The dashboard holds your heatmap and settings only. You can also open it from **Details → Extension options** on Chrome’s extensions page.
+The timer lives entirely in the toolbar: the icon starts, pauses, and resumes, and the right-click menu jumps straight to focus or a break. History and settings are separate pages. **Pomodoro history** in the right-click menu opens the heatmap; Chrome’s own **Options** item in that menu, or **Details → Extension options** on Chrome’s extensions page, opens the settings.
 
 Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break after every 4 completed focus sessions**. Every session starts manually. Finishing focus queues the next break; finishing a break queues focus. **Start focusing** and **Start break** start that session immediately and replace whatever is running, which also makes them the way to abandon a session: an interrupted focus session is not recorded. **Start break** takes the long break when one is owed and a short one otherwise. Skipping or cutting sessions short does not disturb the long break owed after every fourth completed focus session. Settings affect future sessions; an already running or paused session keeps its duration.
 
@@ -42,7 +42,7 @@ Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break 
 - A session is assigned to the local calendar date of its scheduled completion, using the computer’s timezone when completion is processed. Historical date keys do not move if you later change timezones.
 - When a session ends, Chromodoro can show a system notification, open a full-page tab, both, or neither. The two checkboxes under **When a session ends** are independent, so you can pick any combination. Both are on by default, so a finished session is hard to miss; turn either off if it is too much.
 - The tab shows what finished and offers to start the next session or skip straight to focus. It closes itself as soon as a session starts anywhere, including from the toolbar, so alerts never pile up as stray tabs.
-- Notifications respect your Chrome and operating-system notification settings; if macOS has notifications turned off for Chrome, nothing appears. The new tab does not depend on those settings, which makes it the reliable option. Click a notification to open the dashboard.
+- Notifications respect your Chrome and operating-system notification settings; if macOS has notifications turned off for Chrome, nothing appears. The new tab does not depend on those settings, which makes it the reliable option. Click a notification to open your history.
 
 ## Permissions
 
@@ -53,7 +53,9 @@ Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break 
 - `manifest.json`: Chrome Manifest V3 configuration (Chrome 120+).
 - `background.js`: Chrome events, serialized storage updates, alarms, badge, and end-of-session alerts.
 - `timer.js`: timer transitions, date keys, completion accounting, settings validation, and stored-state migration.
-- `dashboard.html`, `dashboard.css`, `dashboard.js`: heatmap and settings page.
+- `history.html`, `history.js`: the heatmap and CSV export.
+- `options.html`, `options.js`: the settings page.
+- `page.js`, `styles.css`: helpers and styles shared by both pages.
 - `alert.html`, `alert.js`: the end-of-session tab.
 - `icons/`: bundled PNG toolbar icons.
 - `tests/`: timer and mocked Chrome API integration tests. Run `npm test` with Node 20+; no dependencies need installing.

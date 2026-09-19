@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pomodoro history</title>
+  <link rel="icon" href="icons/icon32.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="history.js"></script>
+</head>
+<body>
+  <main>
+    <header class="header"><img src="icons/icon48.png" width="28" height="28" alt=""><span class="brand">chromodoro<span class="brand-dot">.</span></span></header>
+    <section class="card heat-card">
+      <div class="card-top"><span id="heat-range" class="muted"></span><button id="export" class="small-button">CSV <span aria-hidden="true">↓</span></button></div>
+      <div class="heat-scroll" id="heat-scroll">
+        <div class="heat-months" id="heat-months" aria-hidden="true"></div>
+        <div class="heat-grid" id="heat-grid" role="grid" aria-label="Completed Pomodoros by day over the last year. Use the arrow keys to move between days."></div>
+      </div>
+      <div class="heat-foot"><span id="heat-total" class="muted"></span><span class="heat-legend" aria-hidden="true">Less<i class="sq"></i><i class="sq l1"></i><i class="sq l2"></i><i class="sq l3"></i><i class="sq l4"></i>More</span></div>
+    </section>
+    <p id="error" role="alert" hidden></p>
+  </main>
+</body>
+</html>

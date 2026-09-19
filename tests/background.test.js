@@ -46,6 +46,9 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     h.chrome.runtime.onInstalled.fire();
     await h.message({ type: 'get' });
     assert.deepEqual([...h.menus.values()].map(item => item.title), ['Start focusing', 'Start break', 'Pomodoro history']);
+    // History is its own page; settings stay on the options page Chrome links as Options.
+    h.chrome.contextMenus.onClicked.fire({ menuItemId: 'history' });
+    assert.match(h.tabs.at(-1).url, /\/history\.html$/);
     assert.equal(h.badge.text, '');
     h.chrome.action.onClicked.fire();
     let result = await h.message({ type: 'get' });

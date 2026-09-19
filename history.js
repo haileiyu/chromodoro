@@ -1,26 +1,15 @@
-import { dayKey, heatmapDays, heatmapLevel, ALERTS } from './timer.js';
+import { dayKey, heatmapDays, heatmapLevel } from './timer.js';
+import { $, report, request } from './page.js';
 
-const $ = id => document.getElementById(id);
-const form = $('settings-form');
 let state;
-let formInitialized = false;
 let lastDate = dayKey();
 let heatBuiltFor = null;
 let heatCells = [];
 let heatDates = [];
 
-function report(error) {
-  $('error').textContent = error.message || String(error);
-  $('error').hidden = false;
-}
-
-async function request(type, payload = {}) {
-  const response = await chrome.runtime.sendMessage({ type, ...payload });
-  if (!response?.ok) throw new Error(response?.error || 'The extension is unavailable. Reload this page and try again.');
-  $('error').hidden = true;
-  state = response.state;
-  render();
-  return state;
+async function load() {
+  state = await request('get');
+  renderHeatmap();
 }
 
 function monthLabel(date) {
@@ -119,17 +108,6 @@ function renderHeatmap() {
   $('heat-total').textContent = `${total} Pomodoro${total === 1 ? '' : 's'} in the last year`;
 }
 
-function render() {
-  renderHeatmap();
-  if (!formInitialized) {
-    for (const [key, value] of Object.entries(state.settings)) {
-      if (typeof value === 'boolean') form.elements[key].checked = value;
-      else form.elements[key].value = value;
-    }
-    formInitialized = true;
-  }
-}
-
 $('heat-grid').addEventListener('keydown', event => {
   const step = { ArrowLeft: -7, ArrowRight: 7, ArrowUp: -1, ArrowDown: 1 }[event.key];
   const from = Number(document.activeElement?.dataset?.index);
@@ -144,21 +122,9 @@ $('heat-grid').addEventListener('keydown', event => {
   target.tabIndex = 0;
   target.focus();
 });
-form.addEventListener('submit', async event => {
-  event.preventDefault();
-  const settings = Object.fromEntries(['focus', 'shortBreak', 'longBreak', 'longEvery'].map(key => [key, Number(form.elements[key].value)]));
-  for (const key of ALERTS) settings[key] = form.elements[key].checked;
-  const button = form.querySelector('[type=submit]');
-  button.disabled = true;
-  try {
-    await request('settings', { settings });
-    $('save-status').textContent = 'Saved';
-  } catch (error) { report(error); } finally { button.disabled = false; }
-});
-form.addEventListener('input', () => { $('save-status').textContent = ''; });
 $('export').addEventListener('click', async () => {
   try {
-    await request('get');
+    await load();
     const rows = ['Date,Pomodoros,Focus minutes', ...Object.entries(state.days).sort(([a], [b]) => a.localeCompare(b)).map(([day, data]) => `${day},${data.count},${data.minutes}`)];
     const url = URL.createObjectURL(new Blob([rows.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8;' }));
     const a = document.createElement('a');
@@ -170,10 +136,10 @@ $('export').addEventListener('click', async () => {
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes.state?.newValue) { state = changes.state.newValue; render(); }
+  if (area === 'local' && changes.state?.newValue) { state = changes.state.newValue; renderHeatmap(); }
 });
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) request('get').catch(report);
+  if (!document.hidden) load().catch(report);
 });
 // The grid is the only time-sensitive thing left on the page, so it only has to
 // notice the date turning over; renderHeatmap rebuilds the window when it does.
@@ -184,4 +150,4 @@ setInterval(() => {
     renderHeatmap();
   }
 }, 30000);
-request('get').catch(report);
+load().catch(report);
