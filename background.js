@@ -75,7 +75,8 @@ async function announce(state, completion) {
 
 async function setupMenus() {
   await chrome.contextMenus.removeAll();
-  for (const [id, title] of [['dashboard', 'Stats & settings'], ['toggle', 'Start / pause / resume'], ['startFocus', 'Start focus now (skip the break)'], ['reset', 'Reset timer (discard this session)']]) {
+  // Menu titles treat a single & as an access-key marker and drop it, so a literal one is &&.
+  for (const [id, title] of [['dashboard', 'Stats && settings'], ['toggle', 'Start / pause / resume'], ['startFocus', 'Start focus now (skip the break)'], ['reset', 'Reset timer (discard this session)']]) {
     await new Promise((resolve, reject) => {
       chrome.contextMenus.create({ id, title, contexts: ['action'] }, () => {
         const error = chrome.runtime.lastError;
