@@ -11,22 +11,13 @@ function enqueue(task) {
   return result;
 }
 
-// The menu may not exist yet: the first sync runs before onInstalled builds it.
-function setMenuEnabled(id, enabled) {
-  return new Promise(resolve => {
-    chrome.contextMenus.update(id, { enabled }, () => { void chrome.runtime.lastError; resolve(); });
-  });
-}
-
 async function syncChrome(state) {
   const view = badge(state);
   await Promise.all([
     chrome.action.setBadgeText({ text: view.text }),
     chrome.action.setBadgeBackgroundColor({ color: view.color }),
     chrome.action.setBadgeTextColor({ color: '#FFFFFF' }),
-    chrome.action.setTitle({ title: view.title }),
-    // Skipping a break costs nothing; restarting a live focus session would discard it unrecorded.
-    setMenuEnabled('startFocus', state.timer?.phase !== 'focus')
+    chrome.action.setTitle({ title: view.title })
   ]);
   if (state.timer?.status === 'running') {
     const [end, tick] = await Promise.all([chrome.alarms.get(END), chrome.alarms.get(TICK)]);
@@ -75,8 +66,7 @@ async function announce(state, completion) {
 
 async function setupMenus() {
   await chrome.contextMenus.removeAll();
-  // Menu titles treat a single & as an access-key marker and drop it, so a literal one is &&.
-  for (const [id, title] of [['dashboard', 'Stats && settings'], ['toggle', 'Start / pause / resume'], ['startFocus', 'Start focus now (skip the break)'], ['reset', 'Reset timer (discard this session)']]) {
+  for (const [id, title] of [['startFocus', 'Start focusing'], ['startBreak', 'Start break'], ['dashboard', 'Pomodoro history']]) {
     await new Promise((resolve, reject) => {
       chrome.contextMenus.create({ id, title, contexts: ['action'] }, () => {
         const error = chrome.runtime.lastError;
@@ -87,12 +77,19 @@ async function setupMenus() {
 }
 
 const reset = state => { state.timer = null; state.nextPhase = 'focus'; state.lastCompletion = null; };
-// Drops a queued or running break. settle() has already banked any finished focus session,
-// so the only thing a live timer here can hold is break time, which is never recorded.
+// Both replace whatever is running. That is deliberate: with no reset control left,
+// they are also how a session gets abandoned. settle() has already banked anything that
+// finished, so what gets dropped is unfinished time, which never counts. state.cycle is
+// untouched, so the long-break schedule only ever moves on completed focus sessions.
 const startFocus = state => {
-  if (state.timer?.phase === 'focus') throw new Error('A focus session is already running. Reset it first to start over.');
   state.timer = null;
   state.nextPhase = 'focus';
+  toggle(state);
+};
+const startBreak = state => {
+  state.timer = null;
+  // Take the break the cycle has queued; with focus queued there is none due, so a short one.
+  if (state.nextPhase === 'focus') state.nextPhase = 'shortBreak';
   toggle(state);
 };
 const run = action => enqueue(() => transact(action));
@@ -102,21 +99,21 @@ chrome.alarms.onAlarm.addListener(alarm => { if ([END, TICK].includes(alarm.name
 chrome.runtime.onInstalled.addListener(() => { void enqueue(async () => { await setupMenus(); await transact(); }); });
 chrome.runtime.onStartup.addListener(() => { void enqueue(async () => { await setupMenus(); await transact(); }); });
 chrome.contextMenus.onClicked.addListener(info => {
-  if (info.menuItemId === 'dashboard') void chrome.runtime.openOptionsPage();
-  if (info.menuItemId === 'toggle') void run(state => toggle(state));
   if (info.menuItemId === 'startFocus') void run(startFocus);
-  if (info.menuItemId === 'reset') void run(reset);
+  if (info.menuItemId === 'startBreak') void run(startBreak);
+  if (info.menuItemId === 'dashboard') void chrome.runtime.openOptionsPage();
 });
 chrome.notifications.onClicked.addListener(id => {
   if (id.startsWith('chromodoro-')) void chrome.runtime.openOptionsPage();
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
-  if (!['get', 'toggle', 'reset', 'phase', 'settings', 'startFocus'].includes(message?.type)) return false;
+  if (!['get', 'toggle', 'reset', 'phase', 'settings', 'startFocus', 'startBreak'].includes(message?.type)) return false;
   run(state => {
     if (message.type === 'toggle') toggle(state);
     if (message.type === 'reset') reset(state);
     if (message.type === 'startFocus') startFocus(state);
+    if (message.type === 'startBreak') startBreak(state);
     if (message.type === 'phase') {
       if (state.timer) throw new Error('Reset the current timer before changing sessions.');
       if (!Object.hasOwn(LABELS, message.phase)) throw new Error('Unknown session type.');

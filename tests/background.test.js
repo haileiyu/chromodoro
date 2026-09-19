@@ -26,9 +26,7 @@ function chromeHarness(persisted = {}) {
     contextMenus: {
       onClicked: event(),
       async removeAll() { menus.clear(); },
-      create(data, callback) { menus.set(data.id, { enabled: true, ...data }); callback(); },
-      // Real Chrome sets lastError for an unknown id; the callback still runs.
-      update(id, props, callback) { if (menus.has(id)) Object.assign(menus.get(id), props); callback(); }
+      create(data, callback) { menus.set(data.id, data); callback(); }
     },
     tabs: { async create(properties) { tabs.push(properties); return { id: tabs.length }; } },
     runtime: { id: 'test-extension', getURL: path => `chrome-extension://test/${path}`, onInstalled: event(), onStartup: event(), onMessage: event(), async openOptionsPage() {} }
@@ -47,7 +45,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     await import(`../background.js?first=${Math.random()}`);
     h.chrome.runtime.onInstalled.fire();
     await h.message({ type: 'get' });
-    assert.equal(h.menus.size, 4);
+    assert.deepEqual([...h.menus.values()].map(item => item.title), ['Start focusing', 'Start break', 'Pomodoro history']);
     assert.equal(h.badge.text, '');
     h.chrome.action.onClicked.fire();
     let result = await h.message({ type: 'get' });
@@ -107,7 +105,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
   }
 });
 
-test('start focus now skips a queued or running break and leaves the long-break cycle intact', async () => {
+test('start focusing skips a break or restarts focus, and leaves the long-break cycle intact', async () => {
   const realNow = Date.now;
   let now = new Date(2026, 8, 5, 9).getTime();
   Date.now = () => now;
@@ -122,7 +120,6 @@ test('start focus now skips a queued or running break and leaves the long-break 
     await import(`../background.js?skip=${Math.random()}`);
     h.chrome.runtime.onInstalled.fire();
     await h.message({ type: 'get' });
-    assert.equal(h.menus.get('startFocus').enabled, true);
     await h.message({ type: 'toggle' });
     let result = await finishFocus();
     assert.equal(result.state.nextPhase, 'shortBreak');
@@ -138,13 +135,13 @@ test('start focus now skips a queued or running break and leaves the long-break 
     assert.equal(h.badge.text, '25m');
     assert.equal(h.alarms.get('chromodoro-end').scheduledTime, now + 25 * 60000);
 
-    // Disabled and refused while focus is live: it must never discard a partial session.
-    assert.equal(h.menus.get('startFocus').enabled, false);
-    const endsAt = result.state.timer.endsAt;
+    // Mid-focus it restarts: the unfinished ten minutes are dropped, not banked.
+    now += 10 * 60000;
     result = await h.message({ type: 'startFocus' });
-    assert.equal(result.ok, false);
-    result = await h.message({ type: 'get' });
-    assert.equal(result.state.timer.endsAt, endsAt);
+    assert.equal(result.ok, true);
+    assert.equal(result.state.timer.endsAt, now + 25 * 60000);
+    assert.equal(result.state.cycle, 1);
+    assert.equal(result.state.days[dayKey(now)].count, 1);
 
     // Skipping a break that is already running discards break time and records nothing.
     result = await finishFocus();
@@ -165,7 +162,6 @@ test('start focus now skips a queued or running break and leaves the long-break 
     assert.equal(result.state.cycle, 4);
     assert.equal(result.state.nextPhase, 'longBreak');
     assert.equal(result.state.days[dayKey(now)].count, 4);
-    assert.equal(h.menus.get('startFocus').enabled, true);
   } finally {
     Date.now = realNow;
     delete globalThis.chrome;
@@ -209,6 +205,52 @@ test('the notification and new tab alerts are independent settings', async () =>
     assert.equal(h.notifications.length, 1);
     // Silence is only about the alert: the Pomodoro itself is still banked.
     assert.equal(quiet.state.days[dayKey(now)].count, 2);
+  } finally {
+    Date.now = realNow;
+    delete globalThis.chrome;
+  }
+});
+
+test('start break takes the break that is due, and abandons a live focus session', async () => {
+  const realNow = Date.now;
+  let now = new Date(2026, 8, 19, 9).getTime();
+  Date.now = () => now;
+  const h = chromeHarness();
+  globalThis.chrome = h.chrome;
+  try {
+    await import(`../background.js?break=${Math.random()}`);
+    h.chrome.runtime.onInstalled.fire();
+    await h.message({ type: 'get' });
+
+    // Nothing completed yet, so no long break is owed: a short one, from the menu itself.
+    h.chrome.contextMenus.onClicked.fire({ menuItemId: 'startBreak' });
+    let result = await h.message({ type: 'get' });
+    assert.equal(result.state.timer.phase, 'shortBreak');
+    assert.equal(result.state.timer.status, 'running');
+    assert.equal(result.state.timer.durationMs, 5 * 60000);
+
+    // Mid-focus: the unfinished session is dropped, nothing is recorded or announced.
+    await h.message({ type: 'startFocus' });
+    now += 10 * 60000;
+    result = await h.message({ type: 'startBreak' });
+    assert.equal(result.state.timer.phase, 'shortBreak');
+    assert.deepEqual(result.state.days, {});
+    assert.equal(result.state.cycle, 0);
+    assert.equal(h.notifications.length, 0);
+    assert.equal(h.tabs.length, 0);
+
+    // After a completed focus session with a long break owed, it is the long one.
+    await h.message({ type: 'settings', settings: { ...result.state.settings, longEvery: 1 } });
+    now = (await h.message({ type: 'startFocus' })).state.timer.endsAt;
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
+    result = await h.message({ type: 'get' });
+    assert.equal(result.state.nextPhase, 'longBreak');
+    h.chrome.contextMenus.onClicked.fire({ menuItemId: 'startBreak' });
+    result = await h.message({ type: 'get' });
+    assert.equal(result.state.timer.phase, 'longBreak');
+    assert.equal(result.state.timer.durationMs, 15 * 60000);
+    assert.equal(result.state.cycle, 1);
+    assert.equal(result.state.days[dayKey(now)].count, 1);
   } finally {
     Date.now = realNow;
     delete globalThis.chrome;

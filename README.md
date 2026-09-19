@@ -22,13 +22,13 @@ No build, npm install, account, or server is needed. Keep the folder in place: C
 | Look at the badge | Remaining rounded-up minutes, such as `16m`, `15m`, … `1m` |
 | Gray badge | Paused; minutes stay visible |
 | Green badge | Break running, or `✓` when a session finishes |
-| Right-click → **Stats & settings** | Open your heatmap and settings |
-| Right-click → **Start focus now** | Skip the break and begin focusing immediately |
-| Right-click → **Reset timer** | Discard the current partial session and return to focus |
+| Right-click → **Start focusing** | Start a focus session now, replacing whatever is running |
+| Right-click → **Start break** | Start the break that is due now, replacing whatever is running |
+| Right-click → **Pomodoro history** | Open your heatmap and settings |
 
-The timer lives entirely in the toolbar: the icon starts, pauses, and resumes, and the right-click menu skips a break or resets. The dashboard holds your heatmap and settings only. You can also open it from **Details → Extension options** on Chrome’s extensions page.
+The timer lives entirely in the toolbar: the icon starts, pauses, and resumes, and the right-click menu jumps straight to focus or a break. The dashboard holds your heatmap and settings only. You can also open it from **Details → Extension options** on Chrome’s extensions page.
 
-Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break after every 4 completed focus sessions**. Every session starts manually. Finishing focus queues the next break; finishing a break queues focus. **Start focus now** skips that break in one click, whether it is queued or already running, and starts focusing right away; break time is never recorded, so nothing is lost. It is unavailable while a focus session is running, so it cannot discard one — use **Reset timer** for that. Skipping breaks does not disturb the long break owed after every fourth completed focus session. Settings affect future sessions, including after you reset; an already running or paused session keeps its duration.
+Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break after every 4 completed focus sessions**. Every session starts manually. Finishing focus queues the next break; finishing a break queues focus. **Start focusing** and **Start break** start that session immediately and replace whatever is running, which also makes them the way to abandon a session: an interrupted focus session is not recorded. **Start break** takes the long break when one is owed and a short one otherwise. Skipping or cutting sessions short does not disturb the long break owed after every fourth completed focus session. Settings affect future sessions; an already running or paused session keeps its duration.
 
 ## Stats and timing
 
