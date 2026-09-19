@@ -94,8 +94,16 @@ const startBreak = state => {
 };
 const run = action => enqueue(() => transact(action));
 // Settings are the options page, which Chrome lists as Options in this same menu;
-// history is its own page so the two items do not open the same thing.
-const openHistory = () => chrome.tabs.create({ url: chrome.runtime.getURL('history.html') });
+// history is its own page so the two items do not open the same thing. Like
+// openOptionsPage, an open history tab is focused rather than duplicated, which matters
+// most for notification clicks. getContexts finds our own pages without "tabs".
+const openHistory = async () => {
+  const url = chrome.runtime.getURL('history.html');
+  const [open] = await chrome.runtime.getContexts({ contextTypes: ['TAB'], documentUrls: [url] });
+  if (!open) return chrome.tabs.create({ url });
+  await chrome.tabs.update(open.tabId, { active: true });
+  await chrome.windows.update(open.windowId, { focused: true });
+};
 
 chrome.action.onClicked.addListener(() => { void run(state => toggle(state)); });
 chrome.alarms.onAlarm.addListener(alarm => { if ([END, TICK].includes(alarm.name)) void run(); });

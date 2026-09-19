@@ -10,6 +10,7 @@ function chromeHarness(persisted = {}) {
   const badge = {};
   const menus = new Map();
   const tabs = [];
+  const focused = [];
   const chrome = {
     storage: { local: {
       async get(key) { return { [key]: structuredClone(persisted[key]) }; },
@@ -28,11 +29,17 @@ function chromeHarness(persisted = {}) {
       async removeAll() { menus.clear(); },
       create(data, callback) { menus.set(data.id, data); callback(); }
     },
-    tabs: { async create(properties) { tabs.push(properties); return { id: tabs.length }; } },
-    runtime: { id: 'test-extension', getURL: path => `chrome-extension://test/${path}`, onInstalled: event(), onStartup: event(), onMessage: event(), async openOptionsPage() {} }
+    tabs: {
+      async create(properties) { tabs.push({ ...properties, id: tabs.length + 1 }); return tabs.at(-1); },
+      async update(id, properties) { focused.push({ id, ...properties }); }
+    },
+    windows: { async update(id, properties) { focused.push({ windowId: id, ...properties }); } },
+    runtime: {
+      id: 'test-extension', getURL: path => `chrome-extension://test/${path}`,
+      async getContexts({ documentUrls }) { return tabs.filter(tab => documentUrls.includes(tab.url)).map(tab => ({ contextType: 'TAB', tabId: tab.id, windowId: 1, documentUrl: tab.url })); }, onInstalled: event(), onStartup: event(), onMessage: event(), async openOptionsPage() {} }
   };
   const message = data => new Promise(resolve => chrome.runtime.onMessage.listeners[0](data, { id: chrome.runtime.id }, resolve));
-  return { chrome, persisted, alarms, notifications, badge, menus, tabs, message };
+  return { chrome, persisted, alarms, notifications, badge, menus, tabs, focused, message };
 }
 
 test('toolbar, restart recovery, concurrent alarms, reset, and settings integration', async () => {
@@ -47,8 +54,19 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     await h.message({ type: 'get' });
     assert.deepEqual([...h.menus.values()].map(item => item.title), ['Start focusing', 'Start break', 'Pomodoro history']);
     // History is its own page; settings stay on the options page Chrome links as Options.
+    // openHistory is not on the state queue, so let its promises settle before looking.
+    const settled = () => new Promise(resolve => setTimeout(resolve, 0));
     h.chrome.contextMenus.onClicked.fire({ menuItemId: 'history' });
-    assert.match(h.tabs.at(-1).url, /\/history\.html$/);
+    await settled();
+    assert.equal(h.tabs.length, 1);
+    assert.match(h.tabs[0].url, /\/history\.html$/);
+    // A second click, or a notification click, focuses that tab instead of adding one.
+    h.chrome.contextMenus.onClicked.fire({ menuItemId: 'history' });
+    h.chrome.notifications.onClicked.fire('chromodoro-x');
+    await settled();
+    assert.equal(h.tabs.length, 1);
+    assert.deepEqual(h.focused.filter(entry => entry.active).map(entry => entry.id), [1, 1]);
+    assert.equal(h.focused.filter(entry => entry.focused).length, 2);
     assert.equal(h.badge.text, '');
     h.chrome.action.onClicked.fire();
     let result = await h.message({ type: 'get' });
