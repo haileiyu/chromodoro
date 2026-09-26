@@ -1,0 +1,8 @@
+Generation mode: built-in image_gen; transparent_background=true
+
+Edit the attached tomato icon reference into a simpler, more geometric abstract cartoon tomato icon.
+Keep the core identity from THIS reference: a red tomato, green calyx on top, and a bold black outer outline. Do not use a clock or any symbols.
+Make the red fruit body a mathematically regular perfect circle, with one uniform vivid red flat fill and an even bold black outline. Remove ALL shading, darker lower crescents, gradients, highlights, white glints, textures, and 3D effects.
+Redesign the green calyx into a very simple geometric stylized tomato leaf crown: a compact arrangement of five broad pointed clean geometric leaf shapes, balanced and radiating from one central point near the circle's top edge. Use straight edges and minimal clean curves, no thin wavy naturalistic foliage, no veins. Short simple stem. One flat green fill and the same black outline vocabulary, avoid doubled internal outlines and busy intersections. The crown must unmistakably read as tomato leaves, not a cannabis leaf. Keep a friendly playful cartoon feel with slightly softened corners.
+Composition: one isolated icon centered on a square transparent canvas, full silhouette visible, approximately 80 percent of canvas width, generous even padding. No white background panel. Actual transparent alpha outside the icon. No cast shadow. No typography, no badges, no clock face, no extra objects, no presentation mockup.
+The result should feel like a crisp minimal flat vector cartoon app icon, clearly recognizable at small size.

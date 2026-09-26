@@ -1,4 +1,8 @@
 import { initialState, migrate, settle, toggle, badge, validateSettings, LABELS } from './timer.js';
+import { createSheetsSync, SHEETS_ALARM } from './sheets-sync.js';
+import { toolbarIcon } from './toolbar-icon.js';
+
+const sheets = createSheetsSync(chrome);
 
 const END = 'chromodoro-end';
 const TICK = 'chromodoro-tick';
@@ -14,6 +18,7 @@ function enqueue(task) {
 async function syncChrome(state) {
   const view = badge(state);
   await Promise.all([
+    toolbarIcon(!state.timer).then(icon => chrome.action.setIcon(icon)),
     chrome.action.setBadgeText({ text: view.text }),
     chrome.action.setBadgeBackgroundColor({ color: view.color }),
     chrome.action.setBadgeTextColor({ color: '#FFFFFF' }),
@@ -35,7 +40,10 @@ async function transact(action) {
   migrate(state);
   const completion = settle(state);
   // Save completion before an action that might fail validation.
-  if (completion) await chrome.storage.local.set({ state });
+  if (completion) {
+    await chrome.storage.local.set({ state });
+    void sheets.kick();
+  }
   if (action) action(state);
   if (JSON.stringify(state) !== before) await chrome.storage.local.set({ state });
   await syncChrome(state);
@@ -106,7 +114,10 @@ const openHistory = async () => {
 };
 
 chrome.action.onClicked.addListener(() => { void run(state => toggle(state)); });
-chrome.alarms.onAlarm.addListener(alarm => { if ([END, TICK].includes(alarm.name)) void run(); });
+chrome.alarms.onAlarm.addListener(alarm => {
+  if ([END, TICK].includes(alarm.name)) void run();
+  if (alarm.name === SHEETS_ALARM) void sheets.kick();
+});
 chrome.runtime.onInstalled.addListener(() => { void enqueue(async () => { await setupMenus(); await transact(); }); });
 chrome.runtime.onStartup.addListener(() => { void enqueue(async () => { await setupMenus(); await transact(); }); });
 chrome.contextMenus.onClicked.addListener(info => {
@@ -119,6 +130,14 @@ chrome.notifications.onClicked.addListener(id => {
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
+  if (['sheetsGet', 'sheetsConnect', 'sheetsNow', 'sheetsDisconnect'].includes(message?.type)) {
+    const actions = {
+      sheetsGet: () => sheets.get(), sheetsConnect: () => sheets.connect(message.connection),
+      sheetsNow: () => sheets.syncNow(), sheetsDisconnect: () => sheets.disconnect()
+    };
+    actions[message.type]().then(state => sendResponse({ ok: true, state }), error => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
   if (!['get', 'toggle', 'reset', 'phase', 'settings', 'startFocus', 'startBreak'].includes(message?.type)) return false;
   run(state => {
     if (message.type === 'toggle') toggle(state);
@@ -141,3 +160,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Every worker wake repairs alarms if Chrome cleared them. No in-memory timer.
 void run();
+void sheets.kick();

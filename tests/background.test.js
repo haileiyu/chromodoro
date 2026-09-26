@@ -2,6 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dayKey } from '../timer.js';
 
+// Canvas and bitmap decoding are supplied by Chrome in the worker.
+globalThis.createImageBitmap = async () => ({ close() {} });
+globalThis.OffscreenCanvas = class {
+  getContext() {
+    return { drawImage() {}, getImageData: () => ({ data: new Uint8ClampedArray([195, 79, 53, 255]) }) };
+  }
+};
+const nativeFetch = globalThis.fetch;
+globalThis.fetch = (url, options) => url.startsWith('chrome-extension://')
+  ? Promise.resolve({ blob: async () => new Blob() }) : nativeFetch(url, options);
+
 // Chrome API contract harness: persistent storage survives worker re-imports.
 function chromeHarness(persisted = {}) {
   const event = () => ({ listeners: [], addListener(fn) { this.listeners.push(fn); }, fire(...args) { this.listeners.forEach(fn => fn(...args)); } });
@@ -14,10 +25,13 @@ function chromeHarness(persisted = {}) {
   const chrome = {
     storage: { local: {
       async get(key) { return { [key]: structuredClone(persisted[key]) }; },
-      async set(value) { Object.assign(persisted, structuredClone(value)); }
+      async set(value) { Object.assign(persisted, structuredClone(value)); },
+      async remove(key) { delete persisted[key]; }
     } },
+    permissions: { async contains() { return true; }, async remove() { return true; } },
     action: {
       onClicked: event(),
+      async setIcon(icon) { badge.icon = icon; },
       async setBadgeText({ text }) { badge.text = text; },
       async setBadgeBackgroundColor({ color }) { badge.color = color; },
       async setBadgeTextColor() {}, async setTitle({ title }) { badge.title = title; }
@@ -41,6 +55,55 @@ function chromeHarness(persisted = {}) {
   const message = data => new Promise(resolve => chrome.runtime.onMessage.listeners[0](data, { id: chrome.runtime.id }, resolve));
   return { chrome, persisted, alarms, notifications, badge, menus, tabs, focused, message };
 }
+
+test('a slow Sheets upload never blocks the timer, and duplicate completion alarms sync once', async () => {
+  const realFetch = globalThis.fetch;
+  const realNow = Date.now;
+  let now = new Date(2026, 8, 20, 9).getTime();
+  Date.now = () => now;
+  const h = chromeHarness();
+  globalThis.chrome = h.chrome;
+  let release, started;
+  const pending = new Promise(resolve => { release = resolve; });
+  const start = new Promise(resolve => { started = resolve; });
+  const uploads = [];
+  globalThis.fetch = async (url, options) => {
+    if (url.startsWith('chrome-extension://')) return { blob: async () => new Blob() };
+    uploads.push(JSON.parse(options.body));
+    if (uploads.length === 1) { started(); await pending; }
+    return { ok: true, json: async () => ({ ok: true }) };
+  };
+  try {
+    await import(`../background.js?sheets=${Math.random()}`);
+    await h.message({ type: 'get' });
+    const connecting = h.message({ type: 'sheetsConnect', connection: {
+      url: 'https://script.google.com/macros/s/test/exec', token: 'a'.repeat(64)
+    } });
+    await start;
+    const running = await h.message({ type: 'startFocus' });
+    assert.equal(running.state.timer.status, 'running');
+    now = running.state.timer.endsAt;
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-tick' });
+    const completed = await h.message({ type: 'get' });
+    assert.equal(completed.state.days[dayKey(now)].count, 1);
+    assert.equal(h.notifications.length, 1);
+    assert.equal(uploads.length, 1);
+    release();
+    await connecting;
+    // Disconnect queues behind the completion upload, giving a deterministic drain.
+    await h.message({ type: 'sheetsDisconnect' });
+    assert.equal(uploads.length, 2);
+    assert.deepEqual(uploads[1].rows, [[dayKey(now), 1, 25]]);
+    assert.equal(h.persisted.sheetsSync, undefined);
+    assert.equal(h.alarms.has('chromodoro-sheets'), false);
+  } finally {
+    release();
+    globalThis.fetch = realFetch;
+    Date.now = realNow;
+    delete globalThis.chrome;
+  }
+});
 
 test('toolbar, restart recovery, concurrent alarms, reset, and settings integration', async () => {
   const realNow = Date.now;
@@ -68,10 +131,12 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     assert.deepEqual(h.focused.filter(entry => entry.active).map(entry => entry.id), [1, 1]);
     assert.equal(h.focused.filter(entry => entry.focused).length, 2);
     assert.equal(h.badge.text, '');
+    assert.ok(h.badge.icon.imageData);
     h.chrome.action.onClicked.fire();
     let result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.status, 'running');
     assert.equal(h.badge.text, '25m');
+    assert.equal(h.badge.icon.path[16], 'icons/icon16.png');
     assert.equal(h.alarms.get('chromodoro-tick').periodInMinutes, 0.5);
     now += 9 * 60000;
     h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-tick' });
@@ -105,7 +170,9 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     assert.equal(simultaneous[1].state.days[dayKey(now)].count, 1);
     assert.equal(h.notifications.length, 1);
     assert.equal(h.alarms.size, 0);
-    assert.equal(h.badge.text, '✓');
+    assert.equal(h.badge.text, '');
+    assert.equal(h.badge.color, '#77736B');
+    assert.ok(h.badge.icon.imageData);
     await h.message({ type: 'toggle' });
     result = await h.message({ type: 'reset' });
     assert.equal(result.state.timer, null);

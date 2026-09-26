@@ -1,0 +1,11 @@
+Generation mode: built-in image_gen; transparent_background=true
+Reference: https://chromewebstore.google.com/detail/marinara-new-pomodoro%C2%AE-as/eandalcihlejmcokgmmbkaopglpfncbo
+
+Use case: logo-brand
+Asset type: one square Chrome extension icon for Chromodoro, a Pomodoro focus timer.
+Primary request: Create an original polished tomato timer icon with a rounded classic cartoon illustration aesthetic. The style reference observed on the Marinara Chrome Web Store listing is a simple round red tomato, spiky green calyx, dark outlines and glossy white highlights. Keep that general friendly red-and-green cartoon vocabulary, but create an unmistakably different silhouette and internal design.
+Subject: a plump slightly squat softly lobed tomato with broad shoulders and a gently tapered rounded bottom, bold dark burgundy outer contour, warm vivid scarlet/coral red body with restrained two-tone cel shading. At top, a compact distinctive crown of THREE broad rounded emerald green leaves and a short curved stem, not a many-pointed spiky calyx. On the tomato's front, a clean thick warm ivory incomplete circular timer arc open near the upper right, enclosing two bold ivory rounded clock hands pointing to 12 and 4 with a small central circular pivot. Keep timer symbol large and optically balanced. One small restrained curved gloss highlight on the upper left of the fruit, separated from the clock symbol.
+Style: professionally finished compact 2D cartoon app icon, vector-like clean curves, thick smooth outlines, simple high contrast shapes; a little nostalgic gloss, not photorealistic or 3D.
+Composition: single centered icon, square 1024x1024 canvas, complete mark occupies about 82 percent of width and height, consistent clear padding, nothing cropped.
+Background: actual transparent alpha, no background tile, no ground shadow.
+Constraints: no text, no letters, no numbers, no watermark, no additional objects, no presentation board, no mockup, no fine dial ticks. Must read clearly at 32px.

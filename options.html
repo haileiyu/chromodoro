@@ -25,6 +25,32 @@
         </div>
       </form>
     </section>
+    <section class="card sync-card" aria-labelledby="sheets-heading">
+      <h1 id="sheets-heading">Google Sheets</h1>
+      <p class="muted">Automatically copy your daily Pomodoros and focus minutes to your own spreadsheet. Your history stays saved in Chrome, too.</p>
+      <details>
+        <summary>Set up your spreadsheet</summary>
+        <ol class="sync-help">
+          <li>In a Google spreadsheet, open <strong>Extensions → Apps Script</strong>.</li>
+          <li>Replace the editor contents with the <a href="google-apps-script/Code.gs" download="Code.gs">setup script</a>. Save, select <strong>setup</strong>, and click <strong>Run</strong>. Authorize your script.</li>
+          <li>Copy the sync key from the execution log. Keep it private: it authorizes writes to the Chromodoro tabs.</li>
+          <li>Choose <strong>Deploy → New deployment → Web app</strong>. Execute as <strong>Me</strong>, allow access to <strong>Anyone</strong>, then deploy. The script checks your key; the spreadsheet itself stays private.</li>
+          <li>Paste the web app URL and sync key below. If your work account blocks this deployment option, use CSV export from History instead.</li>
+        </ol>
+      </details>
+      <form id="sheets-form" class="sync-form">
+        <label>Web app URL<input name="url" type="url" placeholder="https://script.google.com/macros/s/…/exec" required autocomplete="off"></label>
+        <label>Sync key<input name="token" type="password" required autocomplete="off" minlength="32" maxlength="128"></label>
+        <div class="sync-actions">
+          <button type="submit" class="small-button save">Connect</button>
+          <button id="sheets-now" type="button" class="small-button" hidden>Sync now</button>
+          <button id="sheets-disconnect" type="button" class="small-button" hidden>Disconnect</button>
+        </div>
+      </form>
+      <p id="sheets-status" role="status" class="muted">Google Sheets backup is off. History is saved only on this computer.</p>
+      <p class="muted sync-note">Sync includes all existing history, then updates after focus sessions. Each Chrome profile gets its own tab. Sheet edits do not change your local history.</p>
+    </section>
+    <p class="muted"><a href="https://github.com/haileiyu/chromodoro/blob/main/PRIVACY.md" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>
     <p id="error" role="alert" hidden></p>
   </main>
 </body>
