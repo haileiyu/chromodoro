@@ -145,6 +145,8 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     h.chrome.action.onClicked.fire();
     result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.status, 'paused');
+    assert.ok(h.badge.icon.imageData);
+    assert.equal(h.badge.color, '#77736B');
     assert.equal(h.alarms.size, 0);
     now += 60 * 60000;
     // New worker, persisted state, and no alarms after a Chrome restart.
@@ -153,9 +155,11 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     await import(`../background.js?second=${Math.random()}`);
     result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.remainingMs, 16 * 60000);
+    assert.ok(h.badge.icon.imageData);
     h.chrome.action.onClicked.fire();
     result = await h.message({ type: 'get' });
     assert.equal(h.alarms.get('chromodoro-end').scheduledTime, now + 16 * 60000);
+    assert.equal(h.badge.icon.path[16], 'icons/icon16.png');
     const deadline = result.state.timer.endsAt;
     // Simulate a suspended worker plus cleared alarms while still running.
     h = chromeHarness(h.persisted);

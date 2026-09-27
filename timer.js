@@ -110,5 +110,5 @@ export function badge(state, now = Date.now()) {
   if (!t) return { text: '', color: '#77736B', title: `Chromodoro · Click to start ${LABELS[state.nextPhase].toLowerCase()}. Right-click for stats.` };
   const minutes = Math.max(1, Math.ceil(remainingMs(t, now) / 60000));
   const paused = t.status === 'paused';
-  return { text: `${minutes}m`, color: paused ? '#77736B' : t.phase === 'focus' ? '#C34F35' : '#39745D', title: `Chromodoro · ${LABELS[t.phase]} · ${minutes} min left${paused ? ' (paused)' : ''}. Click to ${paused ? 'resume' : 'pause'}. Right-click for stats.` };
+  return { text: `${minutes}m`, color: paused ? '#77736B' : t.phase === 'focus' ? '#D52B1E' : '#3B7F32', title: `Chromodoro · ${LABELS[t.phase]} · ${minutes} min left${paused ? ' (paused)' : ''}. Click to ${paused ? 'resume' : 'pause'}. Right-click for stats.` };
 }

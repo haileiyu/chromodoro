@@ -18,7 +18,7 @@ function enqueue(task) {
 async function syncChrome(state) {
   const view = badge(state);
   await Promise.all([
-    toolbarIcon(!state.timer).then(icon => chrome.action.setIcon(icon)),
+    toolbarIcon(state.timer?.status !== 'running').then(icon => chrome.action.setIcon(icon)),
     chrome.action.setBadgeText({ text: view.text }),
     chrome.action.setBadgeBackgroundColor({ color: view.color }),
     chrome.action.setBadgeTextColor({ color: '#FFFFFF' }),

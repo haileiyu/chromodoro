@@ -1,13 +1,13 @@
 const sizes = [16, 32, 48, 128];
 const activeIcon = { path: Object.fromEntries(sizes.map(size => [size, `icons/icon${size}.png`])) };
-let idleIcon;
+let grayscaleIcon;
 
 // Render the existing artwork in gray, preserving its shape and transparency.
 // Cache the pixels for this worker's lifetime instead of redrawing on every tick.
-export async function toolbarIcon(idle) {
-  if (!idle) return activeIcon;
-  if (!idleIcon) {
-    idleIcon = Promise.all(sizes.map(async size => {
+export async function toolbarIcon(grayscale) {
+  if (!grayscale) return activeIcon;
+  if (!grayscaleIcon) {
+    grayscaleIcon = Promise.all(sizes.map(async size => {
       const response = await fetch(chrome.runtime.getURL(`icons/icon${size}.png`));
       const bitmap = await createImageBitmap(await response.blob());
       const context = new OffscreenCanvas(size, size).getContext('2d');
@@ -20,9 +20,9 @@ export async function toolbarIcon(idle) {
       }
       return [size, pixels];
     })).then(entries => ({ imageData: Object.fromEntries(entries) })).catch(error => {
-      idleIcon = undefined;
+      grayscaleIcon = undefined;
       throw error;
     });
   }
-  return idleIcon;
+  return grayscaleIcon;
 }
