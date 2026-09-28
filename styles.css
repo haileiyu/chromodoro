@@ -1,4 +1,4 @@
-:root{color-scheme:light;--bg:#f7f6f2;--paper:#fffefa;--text:#2c302b;--muted:#76796f;--line:#e6e5dd;--accent:#bb513b;--sq:11px;--l0:#f0eee3;--l1:#f0cec2;--l2:#dd9b86;--l3:#c9704f;--l4:#bb513b;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px}
+:root{color-scheme:light;--bg:#f7f6f2;--paper:#fffefa;--text:#2c302b;--muted:#76796f;--line:#e6e5dd;--accent:#f21f15;--sq:11px;--l0:#ebedf0;--l1:#9be9a8;--l2:#40c463;--l3:#30a14e;--l4:#216e39;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.48}button,input{outline-offset:4px}button:focus-visible,input:focus-visible{outline:2px solid var(--accent)}
 main{max-width:880px;margin:0 auto;padding:0 24px 48px}
 .header{display:flex;align-items:center;gap:10px;height:84px}

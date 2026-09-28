@@ -79,7 +79,7 @@ The integration uses Google’s documented [Apps Script web apps](https://develo
 - `google-apps-script/Code.gs`: the authenticated receiver deployed by the spreadsheet owner.
 - `page.js`, `styles.css`: helpers and styles shared by both pages.
 - `alert.html`, `alert.js`: the end-of-session tab.
-- `icons/`: transparent PNG logo (`logo.png`) and bundled 16, 32, 48, and 128 pixel icons derived from it. The size variants trim excess transparent margins so the tomato fills the toolbar icon. Pages, notifications, and the toolbar share these icons; paused and idle toolbar icons are generated in grayscale at runtime.
+- `icons/`: transparent PNG logo (`logo.png`) and bundled 16, 32, 48, and 128 pixel icons (`icon<size>.png`) derived from it. The size variants trim excess transparent margins so the tomato fills the toolbar icon. Pages, notifications, and the toolbar share these icons; paused and idle toolbar icons are generated in grayscale at runtime.
 - `tests/`: timer and mocked Chrome API integration tests. Run `npm test` with Node 20+; no dependencies need installing.
 
 The automated tests cover badge rounding, pause/resume, serialization, midnight completion, duplicate events, break cycles, settings, worker restart recovery, simultaneous events, alert settings, and migration of pre-existing stored settings. Sheets tests cover backfill, retries, network failures, worker restart, duplicate/stale uploads, authentication, profile isolation, and disconnect. They simulate Chrome and Apps Script APIs; a local unpacked installation is the final check for real toolbar rendering, OS notifications, and a live Google deployment.
