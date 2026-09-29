@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey } from '../timer.js';
+import { dayKey, initialState } from '../timer.js';
 
 // Canvas and bitmap decoding are supplied by Chrome in the worker.
 globalThis.createImageBitmap = async () => ({ close() {} });
@@ -26,9 +26,8 @@ function chromeHarness(persisted = {}) {
     storage: { local: {
       async get(key) { return { [key]: structuredClone(persisted[key]) }; },
       async set(value) { Object.assign(persisted, structuredClone(value)); },
-      async remove(key) { delete persisted[key]; }
+      async remove(keys) { for (const key of Array.isArray(keys) ? keys : [keys]) delete persisted[key]; }
     } },
-    permissions: { async contains() { return true; }, async remove() { return true; } },
     action: {
       onClicked: event(),
       async setIcon(icon) { badge.icon = icon; },
@@ -56,51 +55,20 @@ function chromeHarness(persisted = {}) {
   return { chrome, persisted, alarms, notifications, badge, menus, tabs, focused, message };
 }
 
-test('a slow Sheets upload never blocks the timer, and duplicate completion alarms sync once', async () => {
-  const realFetch = globalThis.fetch;
-  const realNow = Date.now;
-  let now = new Date(2026, 8, 20, 9).getTime();
-  Date.now = () => now;
-  const h = chromeHarness();
+test('upgrading removes old backup credentials and retry alarm without losing history', async () => {
+  const savedState = { ...initialState(), days: { '2026-09-20': { count: 2, minutes: 50 } } };
+  const h = chromeHarness({ state: savedState, sheetsSync: { token: 'old-secret' }, sheetsSource: 'old-id' });
+  h.alarms.set('chromodoro-sheets', { periodInMinutes: 5 });
   globalThis.chrome = h.chrome;
-  let release, started;
-  const pending = new Promise(resolve => { release = resolve; });
-  const start = new Promise(resolve => { started = resolve; });
-  const uploads = [];
-  globalThis.fetch = async (url, options) => {
-    if (url.startsWith('chrome-extension://')) return { blob: async () => new Blob() };
-    uploads.push(JSON.parse(options.body));
-    if (uploads.length === 1) { started(); await pending; }
-    return { ok: true, json: async () => ({ ok: true }) };
-  };
   try {
-    await import(`../background.js?sheets=${Math.random()}`);
-    await h.message({ type: 'get' });
-    const connecting = h.message({ type: 'sheetsConnect', connection: {
-      url: 'https://script.google.com/macros/s/test/exec', token: 'a'.repeat(64)
-    } });
-    await start;
-    const running = await h.message({ type: 'startFocus' });
-    assert.equal(running.state.timer.status, 'running');
-    now = running.state.timer.endsAt;
-    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
-    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-tick' });
-    const completed = await h.message({ type: 'get' });
-    assert.equal(completed.state.days[dayKey(now)].count, 1);
-    assert.equal(h.notifications.length, 1);
-    assert.equal(uploads.length, 1);
-    release();
-    await connecting;
-    // Disconnect queues behind the completion upload, giving a deterministic drain.
-    await h.message({ type: 'sheetsDisconnect' });
-    assert.equal(uploads.length, 2);
-    assert.deepEqual(uploads[1].rows, [[dayKey(now), 1, 25]]);
+    await import(`../background.js?upgrade=${Math.random()}`);
+    const result = await h.message({ type: 'get' });
+    assert.deepEqual(result.state.days, savedState.days);
     assert.equal(h.persisted.sheetsSync, undefined);
+    assert.equal(h.persisted.sheetsSource, undefined);
     assert.equal(h.alarms.has('chromodoro-sheets'), false);
+    assert.equal(h.chrome.runtime.onMessage.listeners[0]({ type: 'sheetsConnect' }, { id: h.chrome.runtime.id }, () => {}), false);
   } finally {
-    release();
-    globalThis.fetch = realFetch;
-    Date.now = realNow;
     delete globalThis.chrome;
   }
 });

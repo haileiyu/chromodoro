@@ -19,9 +19,8 @@ window.chrome = {
     if (message.type==='settings') state.settings=validateSettings(message.settings);
     if (message.type==='toggle') toggle(state);
     if (message.type==='startFocus') {state.timer=null;state.nextPhase='focus';toggle(state);}
-    if (message.type==='sheetsGet'||message.type==='sheetsDisconnect') return {ok:true,state:{enabled:false,url:''}};
     return {ok:true,state:structuredClone(state)};
-  }}, storage:{onChanged:{addListener(){}}}, permissions:{async request(){return false}}
+  }}
 };
 await import('/'+document.body.dataset.page+'.js');
 `;
@@ -32,7 +31,7 @@ http.createServer(async (request,response) => {
       response.setHeader('Content-Type','text/javascript'); response.end(fixture); return;
     }
     const relative = pathname.slice(1);
-    if (!/^(?:[a-z-]+\.(?:html|js|css)|icons\/icon\d+\.png|store\/(?:promo|history-screenshot|settings-screenshot)\.html|google-apps-script\/Code\.gs)$/.test(relative)) {
+    if (!/^(?:[a-z-]+\.(?:html|js|css)|icons\/icon\d+\.png|store\/(?:promo|history-screenshot|settings-screenshot)\.html)$/.test(relative)) {
       response.writeHead(404); response.end(); return;
     }
     let body = await readFile(join(root, relative));

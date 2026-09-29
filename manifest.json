@@ -5,7 +5,6 @@
   "description": "One-click focus timer, remaining minutes on your toolbar, and private daily Pomodoro stats.",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "alarms", "contextMenus", "notifications"],
-  "optional_host_permissions": ["https://script.google.com/*", "https://script.googleusercontent.com/*"],
   "background": { "service_worker": "background.js", "type": "module" },
   "action": {
     "default_title": "Chromodoro · Click to start focusing. Right-click for stats.",

@@ -2,7 +2,8 @@ const sizes = [16, 32, 48, 128];
 const activeIcon = { path: Object.fromEntries(sizes.map(size => [size, `icons/icon${size}.png`])) };
 let grayscaleIcon;
 
-// Render the existing artwork in gray, preserving its shape and transparency.
+// Match the light gray of other inactive toolbar icons while keeping the leaf
+// and highlights distinct. The tomato's original red is about 75 in luma.
 // Cache the pixels for this worker's lifetime instead of redrawing on every tick.
 export async function toolbarIcon(grayscale) {
   if (!grayscale) return activeIcon;
@@ -15,7 +16,11 @@ export async function toolbarIcon(grayscale) {
       bitmap.close();
       const pixels = context.getImageData(0, 0, size, size);
       for (let i = 0; i < pixels.data.length; i += 4) {
-        const gray = Math.round(0.2126 * pixels.data[i] + 0.7152 * pixels.data[i + 1] + 0.0722 * pixels.data[i + 2]);
+        const red = pixels.data[i];
+        const green = pixels.data[i + 1];
+        const blue = pixels.data[i + 2];
+        const luma = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+        const gray = Math.min(255, Math.round(194 + (luma - 75) * 0.3 - Math.max(0, green - red) * 0.7));
         pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = gray;
       }
       return [size, pixels];
