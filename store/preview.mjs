@@ -14,7 +14,9 @@ for (let i=350; i>=0; i--) {
 }
 state.lastCompletion = {id:'demo',phase:'focus',endedAt:Date.now(),minutes:25};
 state.nextPhase='shortBreak';
+state.historySync={status:'ready'};
 window.chrome = {
+  storage: {onChanged: {addListener() {}}},
   runtime: {async sendMessage(message) {
     if (message.type==='settings') state.settings=validateSettings(message.settings);
     if (message.type==='toggle') toggle(state);

@@ -71,6 +71,12 @@ function buildHeatmap() {
 }
 
 function renderHeatmap() {
+  const status = state.historySync?.status;
+  $('sync-status').textContent = status === 'ready'
+    ? 'Ready for Chrome sync. Chrome controls when changes reach your other devices.'
+    : status === 'limited'
+      ? 'Chrome’s sync storage is full. Your history is saved on this device; sharing will retry automatically.'
+      : 'History is saved on this device. Sync is waiting and will retry automatically.';
   if (heatBuiltFor !== dayKey()) buildHeatmap();
   // Days before the first recorded one stay blank: a new install should not open on a
   // year of misses, and those squares are not data a screen reader should walk through.
@@ -137,6 +143,14 @@ $('export').addEventListener('click', async () => {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.state?.newValue) { state = changes.state.newValue; renderHeatmap(); }
+});
+$('sync-history').addEventListener('click', async () => {
+  $('sync-history').disabled = true;
+  try {
+    state = await request('syncHistory');
+    renderHeatmap();
+  } catch (error) { report(error); }
+  finally { $('sync-history').disabled = false; }
 });
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) load().catch(report);

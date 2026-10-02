@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dayKey, initialState } from '../timer.js';
+import { PREFIX } from '../history-sync.js';
 
 // Canvas and bitmap decoding are supplied by Chrome in the worker.
 globalThis.createImageBitmap = async () => ({ close() {} });
@@ -14,7 +15,7 @@ globalThis.fetch = (url, options) => url.startsWith('chrome-extension://')
   ? Promise.resolve({ blob: async () => new Blob() }) : nativeFetch(url, options);
 
 // Chrome API contract harness: persistent storage survives worker re-imports.
-function chromeHarness(persisted = {}) {
+function chromeHarness(persisted = {}, synced = {}) {
   const event = () => ({ listeners: [], addListener(fn) { this.listeners.push(fn); }, fire(...args) { this.listeners.forEach(fn => fn(...args)); } });
   const alarms = new Map();
   const notifications = [];
@@ -23,7 +24,11 @@ function chromeHarness(persisted = {}) {
   const tabs = [];
   const focused = [];
   const chrome = {
-    storage: { local: {
+    storage: { onChanged: event(), sync: {
+      async get() { return structuredClone(synced); },
+      async set(value) { Object.assign(synced, structuredClone(value)); },
+      async remove(keys) { for (const key of keys) delete synced[key]; }
+    }, local: {
       async get(key) { return { [key]: structuredClone(persisted[key]) }; },
       async set(value) { Object.assign(persisted, structuredClone(value)); },
       async remove(keys) { for (const key of Array.isArray(keys) ? keys : [keys]) delete persisted[key]; }
@@ -52,7 +57,7 @@ function chromeHarness(persisted = {}) {
       async getContexts({ documentUrls }) { return tabs.filter(tab => documentUrls.includes(tab.url)).map(tab => ({ contextType: 'TAB', tabId: tab.id, windowId: 1, documentUrl: tab.url })); }, onInstalled: event(), onStartup: event(), onMessage: event(), async openOptionsPage() {} }
   };
   const message = data => new Promise(resolve => chrome.runtime.onMessage.listeners[0](data, { id: chrome.runtime.id }, resolve));
-  return { chrome, persisted, alarms, notifications, badge, menus, tabs, focused, message };
+  return { chrome, persisted, synced, alarms, notifications, badge, menus, tabs, focused, message };
 }
 
 test('upgrading removes old backup credentials and retry alarm without losing history', async () => {
@@ -71,6 +76,51 @@ test('upgrading removes old backup credentials and retry alarm without losing hi
   } finally {
     delete globalThis.chrome;
   }
+});
+
+test('remote history updates merge while the active timer and break cycle stay local', async () => {
+  const h = chromeHarness();
+  globalThis.chrome = h.chrome;
+  const remoteKey = `${PREFIX}00000000-0000-4000-8000-000000000002:${dayKey().slice(0, 7)}`;
+  const day = Number(dayKey().slice(8));
+  try {
+    await import(`../background.js?sync=${Math.random()}`);
+    const before = (await h.message({ type: 'startFocus' })).state;
+    h.synced[remoteKey] = { [day]: [3, 90] };
+    h.chrome.storage.onChanged.fire({ [remoteKey]: { newValue: h.synced[remoteKey] } }, 'sync');
+    let result = await h.message({ type: 'get' });
+    assert.deepEqual(result.state.timer, before.timer);
+    assert.equal(result.state.cycle, 0);
+    assert.deepEqual(result.state.days[dayKey()], { count: 3, minutes: 90 });
+    h.chrome.storage.onChanged.fire({ [remoteKey]: { newValue: h.synced[remoteKey] } }, 'sync');
+    result = await h.message({ type: 'syncHistory' });
+    assert.equal(result.state.days[dayKey()].count, 3);
+    assert.equal(h.notifications.length, 0);
+    assert.equal(result.state.historySync.status, 'ready');
+  } finally { delete globalThis.chrome; }
+});
+
+test('failed sync does not prevent completion alerts; the retry alarm publishes exactly once', async () => {
+  const state = initialState();
+  state.timer = { id: 'offline-focus', phase: 'focus', status: 'running', endsAt: Date.now() - 1, durationMs: 25 * 60000 };
+  const h = chromeHarness({ state });
+  const originalSet = h.chrome.storage.sync.set;
+  h.chrome.storage.sync.set = async () => { throw new Error('QUOTA_BYTES exceeded'); };
+  globalThis.chrome = h.chrome;
+  try {
+    await import(`../background.js?retry=${Math.random()}`);
+    let result = await h.message({ type: 'get' });
+    assert.equal(result.state.days[dayKey()].count, 1);
+    assert.equal(result.state.historySync.status, 'limited');
+    assert.equal(h.notifications.length, 1);
+    h.chrome.storage.sync.set = originalSet;
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-history-sync' });
+    result = await h.message({ type: 'get' });
+    assert.equal(result.state.historySync.status, 'ready');
+    assert.equal(result.state.days[dayKey()].count, 1);
+    assert.equal(h.notifications.length, 1);
+    assert.deepEqual(Object.values(h.synced)[0], { [Number(dayKey().slice(8))]: [1, 25] });
+  } finally { delete globalThis.chrome; }
 });
 
 test('toolbar, restart recovery, concurrent alarms, reset, and settings integration', async () => {
@@ -115,7 +165,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     assert.equal(result.state.timer.status, 'paused');
     assert.ok(h.badge.icon.imageData);
     assert.equal(h.badge.color, '#77736B');
-    assert.equal(h.alarms.size, 0);
+    assert.deepEqual([...h.alarms.keys()], ['chromodoro-history-sync']);
     now += 60 * 60000;
     // New worker, persisted state, and no alarms after a Chrome restart.
     h = chromeHarness(h.persisted);
@@ -141,7 +191,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     const simultaneous = await Promise.all([h.message({ type: 'get' }), h.message({ type: 'get' })]);
     assert.equal(simultaneous[1].state.days[dayKey(now)].count, 1);
     assert.equal(h.notifications.length, 1);
-    assert.equal(h.alarms.size, 0);
+    assert.deepEqual([...h.alarms.keys()], ['chromodoro-history-sync']);
     assert.equal(h.badge.text, '');
     assert.equal(h.badge.color, '#77736B');
     assert.ok(h.badge.icon.imageData);

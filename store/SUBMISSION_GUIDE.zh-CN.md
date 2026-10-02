@@ -13,7 +13,7 @@
 
 | 后台位置 | 填写内容 |
 | --- | --- |
-| Add new item → Upload | 上传 `release/chromodoro-1.0.0.zip`；不要上传整套素材包 |
+| Add new item → Upload | 上传 `release/chromodoro-1.1.0.zip`；不要上传整套素材包 |
 | Store listing → 名称、简短说明、详细说明 | 从 `store/listing.md` 的 Name、Short description、Detailed description 复制 |
 | Store listing → Category / Language | Productivity / English |
 | Store listing → 图标 | `icons/icon128.png` |
@@ -30,16 +30,16 @@
 
 ## 隐私申报依据
 
-即使数据只保存在本地，后台也要求申报数据处理。Chromodoro 在本地保存计时状态、用户设置、每日完成次数与专注分钟数。用户可以主动导出 CSV 文件；插件不再提供 Google Sheets 备份，也不会上传这些记录。
+即使数据只保存在本地，后台也要求申报数据处理。Chromodoro 在本地保存计时状态、用户设置、每日完成次数与专注分钟数。用户可以主动导出 CSV 文件；插件不再提供 Google Sheets 备份。启用 Chrome 扩展同步后，最近 24 个自然月的每日次数、分钟数、日期及随机安装标识会通过 Google 在同一账号的 Chrome 实例之间同步；旧记录仍保留在已经拥有它们的设备本地。计时器和设置保持各设备独立。
 
-填写 Data usage 时应考虑 **User activity**（专注记录），并按后台当前类别定义填写。不要选择笼统的“完全不处理用户数据”。插件不读取浏览历史、网页内容、位置或个人通讯；没有开发者运营的接收历史记录的服务器、广告或分析追踪器。申报内容必须与公开隐私政策一致。
+填写 Data usage 时应考虑 **User activity**（专注记录，包括通过 Google Chrome 同步的记录），并按后台当前类别定义填写。不要选择笼统的“完全不处理用户数据”。插件不读取浏览历史、网页内容、位置或个人通讯；没有开发者运营的接收历史记录的服务器、广告或分析追踪器。申报内容必须与公开隐私政策一致。
 
 ## 提交前检查
 
 - 用无痕窗口确认隐私政策网址可访问，内容与 `PRIVACY.md` 相同。
 - 确认开发者后台的公开联系邮箱、发布者名称和 Non-Trader 状态。
 - 确认图片尺寸与界面一致；历史截图中的数据明确标为 **Example history**。
-- 确认后台中若已有旧版本，待上传版本号必须高于已发布版本；本包版本是 `1.0.0`。
+- 确认后台中若已有旧版本，待上传版本号必须高于已发布版本；本包版本是 `1.1.0`。
 - 上传后完成 Store listing、Privacy practices、Distribution 和 Test instructions，再点击 **Submit for Review**。可选择审核通过后自动发布，或选择延迟发布后手动上线。
 
 官方说明：[发布流程](https://developer.chrome.com/docs/webstore/publish)、[隐私字段](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)、[图片规格](https://developer.chrome.com/docs/webstore/images)、[发布范围](https://developer.chrome.com/docs/webstore/cws-dashboard-distribution)。

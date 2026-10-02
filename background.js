@@ -1,9 +1,11 @@
 import { initialState, migrate, settle, toggle, badge, validateSettings, LABELS } from './timer.js';
 import { toolbarIcon } from './toolbar-icon.js';
+import { prepareHistory, recordCompletion, createHistorySync, SYNC_ALARM, PREFIX } from './history-sync.js';
 
 const END = 'chromodoro-end';
 const TICK = 'chromodoro-tick';
 let queue = Promise.resolve();
+const syncHistory = createHistorySync(chrome);
 
 // Serialize read/modify/write across toolbar clicks, alarms, and settings tabs.
 function enqueue(task) {
@@ -30,12 +32,14 @@ async function syncChrome(state) {
   }
 }
 
-async function transact(action) {
+async function transact(action, forceSync = false) {
   const stored = await chrome.storage.local.get('state');
   const state = stored.state ?? initialState();
   const before = JSON.stringify(stored.state);
   migrate(state);
+  prepareHistory(state);
   const completion = settle(state);
+  recordCompletion(state, completion);
   // Save completion before an action that might fail validation.
   if (completion) {
     await chrome.storage.local.set({ state });
@@ -44,6 +48,7 @@ async function transact(action) {
   if (JSON.stringify(state) !== before) await chrome.storage.local.set({ state });
   await syncChrome(state);
   if (completion) await announce(state, completion);
+  await syncHistory(state, forceSync || completion?.phase === 'focus');
   return state;
 }
 
@@ -96,7 +101,7 @@ const startBreak = state => {
   if (state.nextPhase === 'focus') state.nextPhase = 'shortBreak';
   toggle(state);
 };
-const run = action => enqueue(() => transact(action));
+const run = (action, forceSync = false) => enqueue(() => transact(action, forceSync));
 // Settings are the options page, which Chrome lists as Options in this same menu;
 // history is its own page so the two items do not open the same thing. Like
 // openOptionsPage, an open history tab is focused rather than duplicated, which matters
@@ -112,6 +117,10 @@ const openHistory = async () => {
 chrome.action.onClicked.addListener(() => { void run(state => toggle(state)); });
 chrome.alarms.onAlarm.addListener(alarm => {
   if ([END, TICK].includes(alarm.name)) void run();
+  if (alarm.name === SYNC_ALARM) void run(undefined, true);
+});
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && Object.keys(changes).some(key => key.startsWith(PREFIX))) void run(undefined, true);
 });
 chrome.runtime.onInstalled.addListener(() => { void enqueue(async () => { await setupMenus(); await transact(); }); });
 chrome.runtime.onStartup.addListener(() => { void enqueue(async () => { await setupMenus(); await transact(); }); });
@@ -125,7 +134,7 @@ chrome.notifications.onClicked.addListener(id => {
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false;
-  if (!['get', 'toggle', 'reset', 'phase', 'settings', 'startFocus', 'startBreak'].includes(message?.type)) return false;
+  if (!['get', 'syncHistory', 'toggle', 'reset', 'phase', 'settings', 'startFocus', 'startBreak'].includes(message?.type)) return false;
   run(state => {
     if (message.type === 'toggle') toggle(state);
     if (message.type === 'reset') reset(state);
@@ -141,7 +150,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       state.settings = validateSettings(message.settings);
       if (!state.timer && state.lastCompletion?.phase === 'focus') state.nextPhase = state.cycle % state.settings.longEvery === 0 ? 'longBreak' : 'shortBreak';
     }
-  }).then(state => sendResponse({ ok: true, state }), error => sendResponse({ ok: false, error: error.message }));
+  }, message.type === 'syncHistory').then(state => sendResponse({ ok: true, state }), error => sendResponse({ ok: false, error: error.message }));
   return true;
 });
 
@@ -150,5 +159,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 void enqueue(async () => {
   await chrome.storage.local.remove(['sheetsSync', 'sheetsSource']);
   await chrome.alarms.clear('chromodoro-sheets');
+  if (!await chrome.alarms.get(SYNC_ALARM)) await chrome.alarms.create(SYNC_ALARM, { periodInMinutes: 15 });
   return transact();
 });

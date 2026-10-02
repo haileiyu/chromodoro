@@ -19,6 +19,12 @@
       </div>
       <div class="heat-foot"><span id="heat-total" class="muted"></span><span class="heat-legend" aria-hidden="true">Less<i class="sq"></i><i class="sq l1"></i><i class="sq l2"></i><i class="sq l3"></i><i class="sq l4"></i>More</span></div>
     </section>
+    <section class="card sync-card" aria-label="History sync">
+      <div class="card-top"><strong>History across devices</strong><button id="sync-history" class="small-button">Check sync</button></div>
+      <p id="sync-status" class="muted" role="status">Preparing history for Chrome sync…</p>
+      <p class="muted">The most recent 24 calendar months are shared when Chrome Sync is enabled for extensions on the same Google account. Install the same Chromodoro extension on each device. Offline changes are shared after reconnecting; delivery may take time.</p>
+      <p class="muted">Older history stays on devices that have it and is included in CSV exports. Timers and settings stay independent on each device.</p>
+    </section>
     <p id="error" role="alert" hidden></p>
   </main>
 </body>

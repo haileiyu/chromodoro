@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8'));
 const files = [
-  'manifest.json', 'background.js', 'timer.js', 'toolbar-icon.js',
+  'manifest.json', 'background.js', 'timer.js', 'toolbar-icon.js', 'history-sync.js',
   'page.js', 'styles.css', 'options.html', 'options.js', 'history.html', 'history.js',
   'alert.html', 'alert.js', 'privacy.html', 'PRIVACY.md',
   ...[16, 32, 48, 128].map(size => `icons/icon${size}.png`)

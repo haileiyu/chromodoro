@@ -1,10 +1,10 @@
 # Chrome Web Store listing — Chromodoro
 
-Last updated: September 28, 2026. This is the source for the store listing and reviewer details; `../PRIVACY.md` is the public privacy policy.
+Last updated: October 1, 2026. This is the source for the store listing and reviewer details; `../PRIVACY.md` is the public privacy policy.
 
 ## Release status
 
-The repository is at version `1.0.0`. Confirm the submitted or published version in the Chrome Web Store Developer Dashboard before uploading an update. Use `chromodoro.contact@gmail.com` as the public contact email and verify it in the dashboard. The intended launch settings are Free, Public, and All regions; confirm them there before submission.
+The repository is at version `1.1.0`. Confirm the submitted or published version in the Chrome Web Store Developer Dashboard before uploading an update. Use `chromodoro.contact@gmail.com` as the public contact email and verify it in the dashboard. The intended launch settings are Free, Public, and All regions; confirm them there before submission.
 
 ## Name
 Chromodoro — Pomodoro Timer
@@ -29,8 +29,8 @@ SEE YOUR PROGRESS
 • Daily Pomodoro counts and focus-minute totals.
 • CSV export of all recorded days.
 
-LOCAL HISTORY
-Your history and settings are saved on this computer. No account is required for the timer. Chromodoro does not read your browsing history or page content and includes no advertising or analytics trackers. Signing into Chrome on another computer does not automatically sync your Chromodoro history.
+HISTORY ACROSS DEVICES
+Your history is saved locally. With Chrome Sync enabled for extensions on the same Google account, the most recent 24 calendar months of daily totals are shared through Google across instances of this extension. Offline changes share after reconnecting. Older records stay on devices that have them and remain available for CSV export. Chrome storage limits can delay sharing; check the history page for status. Timers and settings remain independent on each device. No account is required for the timer. Chromodoro does not read browsing history or page content and includes no advertising or analytics trackers.
 
 GET STARTED
 Pin Chromodoro in Chrome's Extensions menu, then click its toolbar icon. Open Options from the extension's right-click menu to customize your sessions and alerts.
@@ -51,7 +51,7 @@ English
 | Completion screenshot | 1280×800 JPEG | `store/assets/completion-1280x800.jpg` |
 | Small promotional tile | 440×280 PNG | `store/assets/promo-440x280.png` |
 
-The history screenshot shows labeled example data rendered by the current history page. The settings screenshot was refreshed against the current UI on September 28, 2026. The idle and paused toolbar icon uses a lighter gray for visibility on dark toolbars; the screenshots do not show the Chrome toolbar.
+The history screenshot shows labeled example data from the earlier history page; refresh it to include the new sync card before store submission. The settings screenshot was refreshed against the current UI on September 28, 2026. The idle and paused toolbar icon uses a lighter gray for visibility on dark toolbars; the screenshots do not show the Chrome toolbar.
 
 ## URLs
 Homepage: leave blank until a Chromodoro-owned site or repository is available.
@@ -64,10 +64,10 @@ Help users manage Pomodoro focus sessions and breaks and review or export their 
 ## Permission justifications
 
 ### storage
-Stores timer state, user-selected durations and alert settings, and daily focus totals locally so they survive service-worker and browser restarts.
+Stores timer state, user-selected durations and alert settings, and daily focus totals locally so they survive service-worker and browser restarts. Also shares recent daily focus totals, dates, and random installation identifiers through Google Chrome Sync when the user enables extension sync.
 
 ### alarms
-Schedules session completion and periodic toolbar countdown updates while the extension service worker sleeps.
+Schedules session completion and periodic toolbar countdown updates and history sync retries while the extension service worker sleeps.
 
 ### contextMenus
 Adds Start focusing, Start break, and Pomodoro history commands to the extension toolbar icon's context menu.
@@ -79,7 +79,7 @@ Displays an optional notification when a focus session or break completes. Users
 No remotely hosted code executes inside the extension. JavaScript, CSS, and icons are packaged locally.
 
 ## Data-use disclosure notes
-Local timer settings and daily focus totals are stored in Chrome extension storage. CSV export creates a file on the user's computer. Chromodoro does not send history to a developer-operated backend and does not read browsing history, page content, personal communications, or location. The public privacy policy is [`PRIVACY.md`](../PRIVACY.md) at the URL above. Review the dashboard's current data-use definitions and disclose locally stored daily focus activity where applicable.
+Timer settings and daily focus totals are stored locally. Recent daily focus activity, dates, and random installation identifiers are also placed in Chrome sync storage and transferred through Google when extension sync is enabled. CSV export creates a file on the user's computer. Chromodoro does not send history to a developer-operated backend and does not read browsing history, page content, personal communications, or location. The public privacy policy is [`PRIVACY.md`](../PRIVACY.md) at the URL above. Review the dashboard's current data-use definitions and disclose the storage and Google synchronization of daily focus activity where applicable.
 
 ## Developer and distribution details
 
@@ -93,6 +93,7 @@ Local timer settings and daily focus totals are stored in Chrome extension stora
 
 | Version | Date | Summary | Store status |
 | --- | --- | --- | --- |
+| 1.1.0 | October 1, 2026 | Added Chrome account history sync with safe merging, local archives, and status | Not submitted |
 | Unreleased | September 28, 2026 | Improved the idle and paused icon; replaced personal links with branded contact information; removed Google Sheets backup | Not submitted |
 | 1.0.0 | To confirm | Toolbar Pomodoro timer and local history | To confirm in Developer Dashboard |
 
@@ -105,4 +106,6 @@ No login or payment is needed for the timer and local history.
 4. In the completion tab, start the break or skip to focus. Verify the completion tab closes. Export a CSV from History and confirm the daily count and focus minutes.
 5. Restore Focus to 25 minutes. No website access is needed for these core features.
 
-No developer-owned credentials or test account are required.
+6. To verify history sync, install this version with the same extension ID on two devices using the same Google account with Chrome Sync enabled for extensions. Complete a session on each, including one offline, then reconnect. After Chrome delivers the records, both devices should show the combined daily total. Timers stay independent. Use Check sync to retry; Ready for Chrome sync confirms storage acceptance, not remote delivery.
+
+No developer-owned credentials or test account are required. Account sync testing requires your own Chrome test account.
