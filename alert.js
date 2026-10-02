@@ -15,7 +15,6 @@ function render(state) {
   $('detail').textContent = done ? `${done.minutes} minutes` : '';
   const next = state.nextPhase;
   $('primary').textContent = `Start ${LABELS[next].toLowerCase()}`;
-  $('primary').classList.toggle('break', next !== 'focus');
   $('primary').disabled = false;
   // Only worth offering when the queued phase is a break we could skip past.
   $('secondary').hidden = next === 'focus';

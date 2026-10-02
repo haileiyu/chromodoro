@@ -7,6 +7,10 @@ import { createHash } from 'node:crypto';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(readFileSync(join(root, 'manifest.json'), 'utf8'));
+const metadata = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+if (manifest.version !== metadata.version) {
+  throw new Error('manifest.json and package.json must have the same release version.');
+}
 const files = [
   'manifest.json', 'background.js', 'timer.js', 'toolbar-icon.js', 'history-sync.js',
   'page.js', 'styles.css', 'options.html', 'options.js', 'history.html', 'history.js',
@@ -33,6 +37,7 @@ try {
   writeFileSync(join(release, 'SHA256SUMS'), `${checksum}  ${packagePath}\n`);
   const kitFiles = [
     packagePath, 'release/SHA256SUMS', 'store/listing.md', 'PRIVACY.md',
+    'icons/icon128.png', 'store/RELEASE_NOTES.md', 'store/RELEASE_CHECKLIST.md',
     'store/SUBMISSION_GUIDE.zh-CN.md',
     'store/assets/history-1280x800.jpg', 'store/assets/settings-1280x800.jpg',
     'store/assets/completion-1280x800.jpg', 'store/assets/promo-440x280.png'

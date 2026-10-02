@@ -84,7 +84,9 @@ Built using Chrome’s documented [Action API](https://developer.chrome.com/docs
 
 ## Chrome Web Store release
 
-Run `npm test`, then `npm run package` to create `release/chromodoro-<version>.zip` and `release/chromodoro-store-upload-kit.zip`. The extension package uses an explicit file list and includes all runtime assets and the privacy policy; development files and sample history are excluded. Upload only the extension ZIP to the Developer Dashboard. The separate kit contains the extension ZIP, store screenshots, listing copy, privacy policy, checksum, and a Chinese submission guide.
+Run `npm test`, then `npm run package` to create `release/chromodoro-<version>.zip` and `release/chromodoro-store-upload-kit.zip`. Packaging requires matching versions in `manifest.json` and `package.json`. The extension package uses an explicit file list and includes all runtime assets and the privacy policy; development files and sample history are excluded. Upload only the extension ZIP to the existing item's Package tab in the Developer Dashboard. The separate kit contains the extension ZIP, store icon, screenshots, listing copy, privacy policy, checksum, release notes, release checklist, and a Chinese submission guide.
+
+See [`store/RELEASE_NOTES.md`](store/RELEASE_NOTES.md) for the 1.1.0 changes and [`store/RELEASE_CHECKLIST.md`](store/RELEASE_CHECKLIST.md) for verification and remaining submission steps.
 
 Store copy, permission explanations, and reviewer instructions are in [`store/listing.md`](store/listing.md). Store images are in `store/assets/`: three 1280×800 screenshots and a 440×280 promotional tile. The history screenshot uses labeled example data rendered by the real history page. `node store/preview.mjs` runs the local-only asset preview; it is not part of the extension package.
 

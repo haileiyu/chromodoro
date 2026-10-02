@@ -6,6 +6,8 @@ Last updated: October 1, 2026. This is the source for the store listing and revi
 
 The repository is at version `1.1.0`. Confirm the submitted or published version in the Chrome Web Store Developer Dashboard before uploading an update. Use `chromodoro.contact@gmail.com` as the public contact email and verify it in the dashboard. The intended launch settings are Free, Public, and All regions; confirm them there before submission.
 
+Release notes are in [`RELEASE_NOTES.md`](RELEASE_NOTES.md). Follow [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) for the prepared files, verification results, and remaining store checks. This is a prepared release, not a confirmation of submission or publication.
+
 ## Name
 Chromodoro — Pomodoro Timer
 
@@ -93,8 +95,7 @@ Timer settings and daily focus totals are stored locally. Recent daily focus act
 
 | Version | Date | Summary | Store status |
 | --- | --- | --- | --- |
-| 1.1.0 | October 1, 2026 | Added Chrome account history sync with safe merging, local archives, and status | Not submitted |
-| Unreleased | September 28, 2026 | Improved the idle and paused icon; replaced personal links with branded contact information; removed Google Sheets backup | Not submitted |
+| 1.1.0 | Prepared October 1, 2026 | Chrome account history sync, local archives and sync status; redesigned History, Settings, and completion pages; includes the previously unreleased icon, contact, and Sheets-backup removal changes | Prepared; dashboard status to confirm |
 | 1.0.0 | To confirm | Toolbar Pomodoro timer and local history | To confirm in Developer Dashboard |
 
 ## Reviewer test instructions
