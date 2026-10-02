@@ -60,7 +60,7 @@ async function announce(state, completion) {
     try {
       await chrome.notifications.create(`chromodoro-${completion.id}`, {
         type: 'basic', iconUrl: 'icons/icon128.png',
-        title: focus ? 'One Pomodoro, nicely done.' : 'Break complete. Ready when you are.',
+        title: focus ? 'Focus complete' : 'Break complete',
         message: focus ? 'Your focus session is saved. Click the Chromodoro icon to start your break.' : 'Click the Chromodoro icon to start your next focus session.'
       });
     } catch (error) { console.warn('Notification unavailable:', error); }

@@ -3,29 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pomodoro history</title>
+  <title>Pomodoro history · Chromodoro</title>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="history.js"></script>
 </head>
 <body>
-  <main>
-    <header class="header"><img src="icons/icon48.png" width="28" height="28" alt=""><span class="brand">chromodoro<span class="brand-dot">.</span></span></header>
-    <section class="card heat-card">
-      <div class="card-top"><span id="heat-range" class="muted"></span><button id="export" class="small-button">CSV <span aria-hidden="true">↓</span></button></div>
-      <div class="heat-scroll" id="heat-scroll">
-        <div class="heat-months" id="heat-months" aria-hidden="true"></div>
-        <div class="heat-grid" id="heat-grid" role="grid" aria-label="Completed Pomodoros by day over the last year. Use the arrow keys to move between days."></div>
-      </div>
-      <div class="heat-foot"><span id="heat-total" class="muted"></span><span class="heat-legend" aria-hidden="true">Less<i class="sq"></i><i class="sq l1"></i><i class="sq l2"></i><i class="sq l3"></i><i class="sq l4"></i>More</span></div>
-    </section>
-    <section class="card sync-card" aria-label="History sync">
-      <div class="card-top"><strong>History across devices</strong><button id="sync-history" class="small-button">Check sync</button></div>
-      <p id="sync-status" class="muted" role="status">Preparing history for Chrome sync…</p>
-      <p class="muted">The most recent 24 calendar months are shared when Chrome Sync is enabled for extensions on the same Google account. Install the same Chromodoro extension on each device. Offline changes are shared after reconnecting; delivery may take time.</p>
-      <p class="muted">Older history stays on devices that have it and is included in CSV exports. Timers and settings stay independent on each device.</p>
-    </section>
-    <p id="error" role="alert" hidden></p>
-  </main>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="history.html" aria-label="Chromodoro home"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4M12 7v5l3 2M18 5l2 2"/><circle cx="12" cy="14" r="8"/></svg>chromodoro</a>
+      <nav class="page-nav" aria-label="Main navigation">
+        <a href="history.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-6M12 20V4M19 20V9"/></svg>History</a>
+        <a href="options.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h8m4 0h4M4 17h3m4 0h9"/><circle cx="14" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Settings</a>
+      </nav>
+    </aside>
+    <main id="main" class="page-content">
+      <header class="page-heading">
+        <h1>Pomodoro history</h1>
+        <button id="export" class="button" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>Export CSV</button>
+      </header>
+      <section class="heat-card" aria-labelledby="history-heading">
+        <div class="section-heading"><h2 id="history-heading">Past year</h2><span id="heat-range" class="muted small"></span></div>
+        <p class="history-total"><span id="heat-total" class="total-value">0</span><span id="heat-total-label" class="muted">completed Pomodoros</span></p>
+        <div class="heat-scroll" id="heat-scroll">
+          <div class="heat-months" id="heat-months" aria-hidden="true"></div>
+          <div class="heat-grid" id="heat-grid" role="grid" aria-label="Completed Pomodoros by day over the last year. Use the arrow keys to move between days."></div>
+        </div>
+        <p id="heat-empty" class="muted" hidden>No completed sessions yet.</p>
+        <div class="heat-foot"><span class="heat-legend" aria-label="Green intensity increases with completed Pomodoros: 0, 1–2, 3–4, 5–6, 7 or more.">Less<i class="sq"></i><i class="sq l1"></i><i class="sq l2"></i><i class="sq l3"></i><i class="sq l4"></i>More</span></div>
+      </section>
+      <section class="sync-section" aria-labelledby="sync-heading">
+        <div class="section-heading"><h2 id="sync-heading">History across devices</h2><button id="sync-history" class="button" type="button">Check sync</button></div>
+        <p id="sync-status" class="muted" role="status">Preparing history for Chrome sync…</p>
+        <details class="sync-details"><summary>How history sync works</summary>
+          <p>The most recent 24 calendar months are shared when Chrome Sync is enabled for extensions on the same Google account. Install the same Chromodoro extension on each device. Offline changes are shared after reconnecting; delivery may take time.</p>
+          <p>Older history stays on devices that have it and is included in CSV exports. Timers and settings stay independent on each device.</p>
+        </details>
+      </section>
+      <p id="error" role="alert" hidden></p>
+    </main>
+  </div>
 </body>
 </html>

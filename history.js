@@ -111,7 +111,9 @@ function renderHeatmap() {
   // One tab stop, arrow keys inside. Keep wherever the user already is.
   const stop = anchor && !anchor.hasAttribute('aria-hidden') ? anchor : latest;
   if (stop) stop.tabIndex = 0;
-  $('heat-total').textContent = `${total} Pomodoro${total === 1 ? '' : 's'} in the last year`;
+  $('heat-total').textContent = total.toLocaleString();
+  $('heat-total-label').textContent = `completed Pomodoro${total === 1 ? '' : 's'}`;
+  $('heat-empty').hidden = Boolean(first);
 }
 
 $('heat-grid').addEventListener('keydown', event => {

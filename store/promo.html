@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Chromodoro promotional tile</title>
 <style>body{margin:0;background:#f7f6f2}canvas{display:block}</style></head>
-<body><canvas width="440" height="280" role="img" aria-label="Chromodoro. Pomodoro timer. Make room for focus."></canvas><a id="download" download="promo-440x280.png">Download promotional tile</a>
+<body><canvas width="440" height="280" role="img" aria-label="Chromodoro. Focus and break timer."></canvas><a id="download" download="promo-440x280.png">Download promotional tile</a>
 <script>
 const canvas=document.querySelector('canvas'), context=canvas.getContext('2d');
 context.fillStyle='#bb513b';context.fillRect(0,0,440,280);
 context.fillStyle='#fffefa';context.font='700 25px -apple-system, BlinkMacSystemFont, sans-serif';context.fillText('chromodoro.',30,49);
 context.font='12px -apple-system, BlinkMacSystemFont, sans-serif';context.letterSpacing='2px';context.fillStyle='#f5dcd3';context.fillText('POMODORO TIMER',30,75);
-context.letterSpacing='-1.4px';context.fillStyle='#fffefa';context.font='41px Georgia, serif';context.fillText('Make room',30,144);context.fillText('for focus.',30,187);
+context.letterSpacing='-1.4px';context.fillStyle='#fffefa';context.font='41px Georgia, serif';context.fillText('Focus and',30,144);context.fillText('break timer.',30,187);
 context.beginPath();context.arc(358,196,55,0,Math.PI*2);context.fill();
 const logo=new Image();logo.onload=()=>{context.drawImage(logo,315,153,86,86);canvas.dataset.ready='true';document.getElementById('download').href=canvas.toDataURL('image/png');};logo.src='../icons/icon128.png';
 </script></body></html>

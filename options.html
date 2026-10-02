@@ -3,30 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chromodoro options</title>
+  <title>Settings · Chromodoro</title>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="options.js"></script>
 </head>
 <body>
-  <main>
-    <header class="header"><img src="icons/icon48.png" width="28" height="28" alt=""><span class="brand">chromodoro<span class="brand-dot">.</span></span></header>
-    <section class="card">
-      <form id="settings-form">
-        <div class="settings-grid">
-          <label>Focus <span class="input-wrap"><input name="focus" type="number" min="1" max="180" required value="25"><span>min</span></span></label>
-          <label>Short break <span class="input-wrap"><input name="shortBreak" type="number" min="1" max="60" required value="5"><span>min</span></span></label>
-          <label>Long break <span class="input-wrap"><input name="longBreak" type="number" min="1" max="90" required value="15"><span>min</span></span></label>
-          <label>Long break every <span class="input-wrap"><input name="longEvery" type="number" min="1" max="12" required value="4"><span>sessions</span></span></label>
-        </div>
-        <div class="settings-bottom">
-          <span class="alert-label">When a session ends<label class="checkbox"><input type="checkbox" name="notify"> Notification</label><label class="checkbox"><input type="checkbox" name="newTab"> New tab</label></span>
-          <span class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button type="submit" class="small-button save">Save</button></span>
-        </div>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="history.html" aria-label="Chromodoro home"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4M12 7v5l3 2M18 5l2 2"/><circle cx="12" cy="14" r="8"/></svg>chromodoro</a>
+      <nav class="page-nav" aria-label="Main navigation">
+        <a href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-6M12 20V4M19 20V9"/></svg>History</a>
+        <a href="options.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h8m4 0h4M4 17h3m4 0h9"/><circle cx="14" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Settings</a>
+      </nav>
+    </aside>
+    <main id="main" class="page-content">
+      <header class="page-heading"><h1>Settings</h1></header>
+      <form id="settings-form" class="settings-form">
+        <fieldset>
+          <legend>Session length</legend>
+          <div class="setting-row"><label for="focus">Focus</label><span class="input-wrap"><input id="focus" name="focus" type="number" min="1" max="180" required value="25" aria-describedby="focus-unit"><span id="focus-unit">min</span></span></div>
+          <div class="setting-row"><label for="short-break">Short break</label><span class="input-wrap"><input id="short-break" name="shortBreak" type="number" min="1" max="60" required value="5" aria-describedby="short-unit"><span id="short-unit">min</span></span></div>
+          <div class="setting-row"><label for="long-break">Long break</label><span class="input-wrap"><input id="long-break" name="longBreak" type="number" min="1" max="90" required value="15" aria-describedby="long-unit"><span id="long-unit">min</span></span></div>
+          <div class="setting-row"><label for="long-every">Long break every</label><span class="input-wrap"><input id="long-every" name="longEvery" type="number" min="1" max="12" required value="4" aria-describedby="every-unit"><span id="every-unit">sessions</span></span></div>
+        </fieldset>
+        <fieldset class="notification-settings">
+          <legend>When a session ends</legend>
+          <label class="setting-row toggle-row" for="notify"><span>Show a notification</span><input class="toggle" id="notify" name="notify" type="checkbox" role="switch"></label>
+          <label class="setting-row toggle-row" for="new-tab"><span>Open a new tab</span><input class="toggle" id="new-tab" name="newTab" type="checkbox" role="switch"></label>
+        </fieldset>
+        <div class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button type="submit" class="button primary">Save changes</button></div>
       </form>
-    </section>
-    <p class="muted"><a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>
-    <p id="error" role="alert" hidden></p>
-  </main>
+      <p class="privacy-link"><a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>
+      <p id="error" role="alert" hidden></p>
+    </main>
+  </div>
 </body>
 </html>

@@ -11,7 +11,7 @@ async function request(type) {
 function render(state) {
   const done = state.lastCompletion;
   const focus = done?.phase === 'focus';
-  $('headline').textContent = !done ? 'Ready when you are' : focus ? 'Focus complete' : 'Break over';
+  $('headline').textContent = !done ? 'Timer idle' : focus ? 'Focus complete' : 'Break complete';
   $('detail').textContent = done ? `${done.minutes} minutes` : '';
   const next = state.nextPhase;
   $('primary').textContent = `Start ${LABELS[next].toLowerCase()}`;

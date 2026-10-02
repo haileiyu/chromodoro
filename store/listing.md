@@ -15,16 +15,16 @@ One-click focus timer, remaining minutes on your toolbar, and private daily Pomo
 ## Detailed description
 Start a focus session with one click. Chromodoro keeps the remaining minutes on your Chrome toolbar, so you can focus without keeping a timer tab open.
 
-Click the icon to start, pause, or resume. Right-click to start focusing, take a break, or view your Pomodoro history. A quiet gray icon shows when the timer is idle.
+Click the icon to start, pause, or resume. Right-click to start focusing, take a break, or view your Pomodoro history. The icon is gray when the timer is idle.
 
-MAKE TIME TO FOCUS
+TIMER AND BREAKS
 • Adjustable focus, short-break, and long-break durations.
 • A long break after your chosen number of completed focus sessions.
 • Optional system notifications and a completion tab, independently configurable.
 • Paused timers survive browser restarts. Running timers use elapsed time, including time while your computer sleeps.
 • Each new session starts when you choose. Unfinished focus sessions and breaks do not count toward your history.
 
-SEE YOUR PROGRESS
+HISTORY
 • A year-long heatmap of completed Pomodoros.
 • Daily Pomodoro counts and focus-minute totals.
 • CSV export of all recorded days.
@@ -51,7 +51,7 @@ English
 | Completion screenshot | 1280×800 JPEG | `store/assets/completion-1280x800.jpg` |
 | Small promotional tile | 440×280 PNG | `store/assets/promo-440x280.png` |
 
-The history screenshot shows labeled example data from the earlier history page; refresh it to include the new sync card before store submission. The settings screenshot was refreshed against the current UI on September 28, 2026. The idle and paused toolbar icon uses a lighter gray for visibility on dark toolbars; the screenshots do not show the Chrome toolbar.
+The history and settings screenshots show the current UI with example data. The idle and paused toolbar icon uses a lighter gray for visibility on dark toolbars; the screenshots do not show the Chrome toolbar.
 
 ## URLs
 Homepage: leave blank until a Chromodoro-owned site or repository is available.
