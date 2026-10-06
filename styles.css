@@ -47,6 +47,8 @@ svg { width: 1.125rem; height: 1.125rem; flex-shrink: 0; }
 .button.primary { background: var(--text); border-color: var(--text); color: #fff; padding: .5625rem 1.0625rem; font-weight: 500; }
 .button.primary:hover { background: #404040; }
 .completion-content { display: flex; align-items: center; justify-content: center; }
+/* Extra bottom space places the panel's center at 38.2% of the viewport height. */
+.page-content.completion-content { padding-top: 2rem; padding-bottom: calc(2rem + 23.6svh + var(--completion-header-height, 0px)); }
 .completion-panel { width: 100%; max-width: 34rem; }
 .completion-panel #detail { margin-top: 10px; }
 .completion-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
@@ -115,7 +117,7 @@ body > main { max-width: 880px; margin: 0 auto; padding: 0 24px 48px; }
   .page-nav { flex-direction: row; }
   .page-nav a { padding: 10px 14px; }
   .page-content { padding: 30px 22px 36px; }
-  .completion-content { min-height: calc(100svh - 132px); }
+  .completion-content { --completion-header-height: 132px; min-height: calc(100svh - var(--completion-header-height)); }
   h1 { font-size: 2rem; }
   .setting-row { gap: 12px; }
   .input-wrap { gap: 5px; }
