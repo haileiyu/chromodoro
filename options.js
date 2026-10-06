@@ -23,3 +23,31 @@ form.addEventListener('submit', async event => {
 });
 form.addEventListener('input', () => { $('save-status').textContent = ''; });
 request('get').then(fill).catch(report);
+
+async function refreshShortcuts() {
+  try {
+    const commands = await chrome.commands.getAll();
+    for (const [name, id] of [['startFocus', 'shortcut-focus'], ['startBreak', 'shortcut-break']]) {
+      $(id).textContent = commands.find(command => command.name === name)?.shortcut || 'Not assigned';
+    }
+  } catch {
+    $('shortcut-focus').textContent = 'Unavailable';
+    $('shortcut-break').textContent = 'Unavailable';
+  }
+}
+
+$('customize-shortcuts').addEventListener('click', async () => {
+  $('shortcut-error').hidden = true;
+  try {
+    await chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+  } catch {
+    $('shortcut-error').textContent = 'Open chrome://extensions/shortcuts in Chrome to customize your shortcuts.';
+    $('shortcut-error').hidden = false;
+  }
+});
+// Chrome owns the bindings; re-read them when returning from its shortcut editor.
+window.addEventListener('focus', refreshShortcuts);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) void refreshShortcuts();
+});
+void refreshShortcuts();

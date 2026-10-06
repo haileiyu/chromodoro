@@ -6,6 +6,16 @@
   "minimum_chrome_version": "120",
   "permissions": ["storage", "alarms", "contextMenus", "notifications"],
   "background": { "service_worker": "background.js", "type": "module" },
+  "commands": {
+    "startFocus": {
+      "suggested_key": { "default": "Ctrl+Shift+8", "mac": "Command+Shift+8" },
+      "description": "Start focusing (replace the current session)"
+    },
+    "startBreak": {
+      "suggested_key": { "default": "Ctrl+Shift+9", "mac": "Command+Shift+9" },
+      "description": "Start break (replace the current session)"
+    }
+  },
   "action": {
     "default_title": "Chromodoro · Click to start focusing. Right-click for stats.",
     "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }

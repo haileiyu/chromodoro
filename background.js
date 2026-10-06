@@ -115,6 +115,10 @@ const openHistory = async () => {
 };
 
 chrome.action.onClicked.addListener(() => { void run(state => toggle(state)); });
+chrome.commands.onCommand.addListener(command => {
+  if (command === 'startFocus') void run(startFocus);
+  if (command === 'startBreak') void run(startBreak);
+});
 chrome.alarms.onAlarm.addListener(alarm => {
   if ([END, TICK].includes(alarm.name)) void run();
   if (alarm.name === SYNC_ALARM) void run(undefined, true);

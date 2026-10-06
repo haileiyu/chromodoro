@@ -25,11 +25,15 @@ No build, npm install, account, or server is needed. Keep the folder in place: C
 | Green badge | Break running |
 | Right-click → **Start focusing** | Start a focus session now, replacing whatever is running |
 | Right-click → **Start break** | Start the break that is due now, replacing whatever is running |
+| `Ctrl+Shift+8` (`⌘+Shift+8` on Mac) | Start focusing, replacing the current session |
+| `Ctrl+Shift+9` (`⌘+Shift+9` on Mac) | Start the break that is due, replacing the current session |
 | Right-click → **Pomodoro history** | Open your heatmap, sync status, and CSV export |
 
 The timer lives entirely in the toolbar: the icon starts, pauses, and resumes, and the right-click menu jumps straight to focus or a break. History and settings share a light sidebar layout; use **History** and **Settings** to move between them. **Pomodoro history** in the right-click menu opens the green activity heatmap; Chrome’s own **Options** item in that menu, or **Details → Extension options** on Chrome’s extensions page, opens the settings.
 
 Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break after every 4 completed focus sessions**. Every session starts manually. Finishing focus queues the next break; finishing a break queues focus. **Start focusing** and **Start break** start that session immediately and replace whatever is running, which also makes them the way to abandon a session: an interrupted focus session is not recorded. **Start break** takes the long break when one is owed and a short one otherwise. Skipping or cutting sessions short does not disturb the long break owed after every fourth completed focus session. Settings affect future sessions; an already running or paused session keeps its duration.
+
+Shortcuts work while Chrome is active. **Settings → Keyboard shortcuts** shows the actual assigned keys, including any custom bindings. Choose **Customize shortcuts** to change or remove them in Chrome. If another extension already uses a default, Chrome may leave it unassigned; choose an available combination at `chrome://extensions/shortcuts`. Shortcuts match the right-click actions and replace running or paused sessions; unfinished focus time is not recorded.
 
 ## Stats and timing
 

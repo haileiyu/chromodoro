@@ -24,6 +24,7 @@ function chromeHarness(persisted = {}, synced = {}) {
   const tabs = [];
   const focused = [];
   const chrome = {
+    commands: { onCommand: event() },
     storage: { onChanged: event(), sync: {
       async get() { return structuredClone(synced); },
       async set(value) { Object.assign(synced, structuredClone(value)); },
@@ -59,6 +60,70 @@ function chromeHarness(persisted = {}, synced = {}) {
   const message = data => new Promise(resolve => chrome.runtime.onMessage.listeners[0](data, { id: chrome.runtime.id }, resolve));
   return { chrome, persisted, synced, alarms, notifications, badge, menus, tabs, focused, message };
 }
+
+test('keyboard commands replace sessions and serialize with completion alarms', async () => {
+  const realNow = Date.now;
+  let now = new Date(2026, 9, 6, 9).getTime();
+  Date.now = () => now;
+  const h = chromeHarness();
+  globalThis.chrome = h.chrome;
+  const command = async name => {
+    h.chrome.commands.onCommand.fire(name);
+    return (await h.message({ type: 'get' })).state;
+  };
+  try {
+    await import(`../background.js?commands=${Math.random()}`);
+    let state = await command('startFocus');
+    assert.equal(state.timer.phase, 'focus');
+    assert.equal(state.timer.status, 'running');
+    assert.equal(h.badge.text, '25m');
+    now += 60000;
+    state = await command('startFocus');
+    assert.equal(state.timer.endsAt, now + 25 * 60000);
+    assert.deepEqual(state.days, {});
+
+    await h.message({ type: 'toggle' }); // A shortcut also replaces a paused session.
+    state = await command('startBreak');
+    assert.equal(state.timer.phase, 'shortBreak');
+    assert.equal(state.timer.status, 'running');
+    assert.equal(state.timer.durationMs, 5 * 60000);
+    assert.deepEqual(state.days, {});
+    assert.equal(h.notifications.length, 0);
+    await h.message({ type: 'settings', settings: { ...state.settings, longEvery: 1 } });
+    state = await command('startFocus');
+    assert.equal(state.timer.phase, 'focus');
+    now = state.timer.endsAt;
+
+    // The command reaches the queue before overdue alarms: bank focus exactly once.
+    h.chrome.commands.onCommand.fire('startBreak');
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-tick' });
+    state = (await h.message({ type: 'get' })).state;
+    assert.equal(state.timer.phase, 'longBreak');
+    assert.equal(state.timer.durationMs, 15 * 60000);
+    assert.equal(state.cycle, 1);
+    assert.equal(state.days[dayKey(now)].count, 1);
+    assert.equal(h.notifications.length, 1);
+    assert.equal(h.alarms.get('chromodoro-end').scheduledTime, state.timer.endsAt);
+    const before = structuredClone(state);
+    state = await command('unknown');
+    assert.deepEqual(state, before);
+
+    // Commands are registered again when the worker wakes with a saved timer.
+    const restarted = chromeHarness(h.persisted);
+    globalThis.chrome = restarted.chrome;
+    await import(`../background.js?commands-restart=${Math.random()}`);
+    restarted.chrome.commands.onCommand.fire('startFocus');
+    state = (await restarted.message({ type: 'get' })).state;
+    assert.equal(state.timer.phase, 'focus');
+    assert.equal(state.timer.status, 'running');
+    assert.equal(state.cycle, 1);
+    assert.equal(state.days[dayKey(now)].count, 1);
+  } finally {
+    Date.now = realNow;
+    delete globalThis.chrome;
+  }
+});
 
 test('upgrading removes old backup credentials and retry alarm without losing history', async () => {
   const savedState = { ...initialState(), days: { '2026-09-20': { count: 2, minutes: 50 } } };

@@ -40,6 +40,17 @@
         </fieldset>
         <div class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button type="submit" class="button primary">Save changes</button></div>
       </form>
+      <section class="shortcut-settings" aria-labelledby="shortcuts-heading">
+        <h2 id="shortcuts-heading">Keyboard shortcuts</h2>
+        <p class="muted">Work while Chrome is active. Each starts a new session, replacing any running or paused session. Start break takes a long break when one is due.</p>
+        <dl class="shortcut-list" aria-live="polite">
+          <div class="setting-row"><dt>Start focusing</dt><dd id="shortcut-focus">Loading…</dd></div>
+          <div class="setting-row"><dt>Start break</dt><dd id="shortcut-break">Loading…</dd></div>
+        </dl>
+        <p class="muted">If a shortcut is unassigned or conflicts with another app, choose different keys in Chrome.</p>
+        <button id="customize-shortcuts" type="button" class="button">Customize shortcuts</button>
+        <p id="shortcut-error" role="status" class="muted" hidden></p>
+      </section>
       <p class="privacy-link"><a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>
       <p id="error" role="alert" hidden></p>
     </main>
