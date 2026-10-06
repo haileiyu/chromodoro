@@ -71,6 +71,9 @@ function buildHeatmap() {
 }
 
 function renderHeatmap() {
+  const todayCount = state.days[dayKey()]?.count ?? 0;
+  $('today-total').textContent = todayCount.toLocaleString();
+  $('today-total-label').textContent = `completed Pomodoro${todayCount === 1 ? '' : 's'}`;
   const status = state.historySync?.status;
   $('sync-status').textContent = status === 'ready'
     ? 'Ready for Chrome sync. Chrome controls when changes reach your other devices.'
@@ -157,8 +160,7 @@ $('sync-history').addEventListener('click', async () => {
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) load().catch(report);
 });
-// The grid is the only time-sensitive thing left on the page, so it only has to
-// notice the date turning over; renderHeatmap rebuilds the window when it does.
+// Refresh today's count and the heatmap window when the local date turns over.
 setInterval(() => {
   const today = dayKey();
   if (today !== lastDate && state) {

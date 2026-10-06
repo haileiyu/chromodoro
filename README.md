@@ -33,6 +33,7 @@ Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break 
 
 ## Stats and timing
 
+- Today's completed Pomodoros, shown above the history heatmap and refreshed as history changes or the local date rolls over.
 - A running total for the last year, shown above the heatmap.
 - A year-long heatmap of completed Pomodoros, one square per day in the style of a contribution graph. Shading uses fixed bands (1–2, 3–4, 5–6, 7 or more), so a shade means the same thing in every month. Days before your first recorded Pomodoro stay blank rather than showing as zeros. Hover a square for its total, or move between days with the arrow keys.
 - CSV export of all dates with completed focus sessions and their actual configured focus minutes.
@@ -42,7 +43,7 @@ Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break 
 - Chrome alarms wake the timer and refresh the badge about every 30 seconds. Chrome may delay badge updates and notifications during sleep or resource throttling. The next wake reconciles the saved deadline and records at most one completion; it never auto-starts more sessions while you are away.
 - A session is assigned to the local calendar date of its scheduled completion, using the computer’s timezone when completion is processed. Historical date keys do not move if you later change timezones.
 - When a session ends, Chromodoro can show a system notification, open a full-page tab, both, or neither. The two switches under **When a session ends** are independent, so you can pick any combination. Both are on by default, so a finished session is hard to miss; turn either off if it is too much.
-- The tab shows what finished and offers to start the next session or skip straight to focus. It closes itself as soon as a session starts anywhere, including from the toolbar, so alerts never pile up as stray tabs.
+- The tab shows what finished and today's total completed Pomodoros, including the focus session that just ended. It offers to start the next session or skip straight to focus. It closes itself as soon as a session starts anywhere, including from the toolbar, so alerts never pile up as stray tabs.
 - Notifications respect your Chrome and operating-system notification settings; if macOS has notifications turned off for Chrome, nothing appears. The new tab does not depend on those settings, which makes it the reliable option. Click a notification to open your history.
 
 ## History across devices

@@ -23,6 +23,10 @@
         <h1>Pomodoro history</h1>
         <button id="export" class="button" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>Export CSV</button>
       </header>
+      <section class="today-summary" aria-labelledby="today-heading">
+        <h2 id="today-heading">Today</h2>
+        <p class="history-total" role="status" aria-atomic="true"><span id="today-total" class="total-value">0</span><span id="today-total-label" class="muted">completed Pomodoros</span></p>
+      </section>
       <section class="heat-card" aria-labelledby="history-heading">
         <div class="section-heading"><h2 id="history-heading">Past year</h2><span id="heat-range" class="muted small"></span></div>
         <p class="history-total"><span id="heat-total" class="total-value">0</span><span id="heat-total-label" class="muted">completed Pomodoros</span></p>
