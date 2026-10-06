@@ -85,7 +85,7 @@ legend { font-size: 1.125rem; font-weight: 500; padding: 0; margin-bottom: 8px; 
 .input-wrap input { width: 4rem; min-width: 0; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: .5rem .3125rem; text-align: center; font-variant-numeric: tabular-nums; appearance: textfield; }
 .input-wrap input::-webkit-inner-spin-button { appearance: none; }
 .input-wrap > span { width: 3.25rem; color: var(--muted); }
-.notification-settings { margin-top: 26px; }
+.notification-settings, .goal-settings { margin-top: 26px; }
 .toggle-row { cursor: pointer; min-height: 48px; }
 .toggle { appearance: none; margin: 0; width: 2.125rem; height: 1.25rem; flex-shrink: 0; border: 1px solid #b4b4b4; border-radius: 20px; background: #b4b4b4; position: relative; cursor: pointer; }
 .toggle::after { content: ''; position: absolute; width: .875rem; height: .875rem; border-radius: 50%; background: #fff; top: calc(.1875rem - 1px); left: calc(.1875rem - 1px); }

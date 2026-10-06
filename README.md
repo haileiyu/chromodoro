@@ -34,6 +34,7 @@ Defaults: **25-minute focus**, **5-minute short break**, **15-minute long break 
 ## Stats and timing
 
 - Today's completed Pomodoros, shown above the history heatmap and refreshed as history changes or the local date rolls over.
+- Set a daily Pomodoro target (1–100) in **Settings → Daily goal** to show progress such as **5/10** on the completion tab and in History. Set it to **0** (the default) for no target. Only completed focus sessions count; exceeding the goal keeps showing your actual total. Progress follows the local calendar day, and your chosen target stays in place for future days. Like other settings, the target is specific to this device.
 - A running total for the last year, shown above the heatmap.
 - A year-long heatmap of completed Pomodoros, one square per day in the style of a contribution graph. Shading uses fixed bands (1–2, 3–4, 5–6, 7 or more), so a shade means the same thing in every month. Days before your first recorded Pomodoro stay blank rather than showing as zeros. Hover a square for its total, or move between days with the arrow keys.
 - CSV export of all dates with completed focus sessions and their actual configured focus minutes.

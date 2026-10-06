@@ -1,4 +1,4 @@
-export const DEFAULTS = Object.freeze({ focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, notify: true, newTab: true });
+export const DEFAULTS = Object.freeze({ focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, dailyTarget: 0, notify: true, newTab: true });
 export const ALERTS = Object.freeze(['notify', 'newTab']);
 export const LABELS = Object.freeze({ focus: 'Focus', shortBreak: 'Short break', longBreak: 'Long break' });
 
@@ -46,6 +46,7 @@ export function migrate(state) {
     delete settings.notifications;
   }
   for (const key of ALERTS) if (typeof settings[key] !== 'boolean') settings[key] = DEFAULTS[key];
+  if (!Number.isInteger(settings.dailyTarget) || settings.dailyTarget < 0 || settings.dailyTarget > 100) settings.dailyTarget = DEFAULTS.dailyTarget;
   state.version = 2;
   return state;
 }
@@ -102,6 +103,9 @@ export function validateSettings(input) {
     if (typeof input[key] !== 'boolean') throw new Error('Choose what happens when a session ends.');
     result[key] = input[key];
   }
+  const target = Number(input.dailyTarget);
+  if (!Number.isInteger(target) || target < 0 || target > 100) throw new Error('Daily target must be a whole number between 0 and 100.');
+  result.dailyTarget = target;
   return result;
 }
 

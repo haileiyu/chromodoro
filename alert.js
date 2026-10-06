@@ -6,7 +6,8 @@ let currentState;
 function renderToday() {
   if (!currentState) return;
   const count = currentState.days[dayKey()]?.count ?? 0;
-  $('today-total').textContent = count.toLocaleString();
+  const target = currentState.settings.dailyTarget;
+  $('today-total').textContent = target ? `${count.toLocaleString()}/${target.toLocaleString()}` : count.toLocaleString();
   $('today-total-label').textContent = `Pomodoro${count === 1 ? '' : 's'} completed today`;
 }
 

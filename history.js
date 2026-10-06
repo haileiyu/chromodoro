@@ -72,7 +72,8 @@ function buildHeatmap() {
 
 function renderHeatmap() {
   const todayCount = state.days[dayKey()]?.count ?? 0;
-  $('today-total').textContent = todayCount.toLocaleString();
+  const target = state.settings.dailyTarget;
+  $('today-total').textContent = target ? `${todayCount.toLocaleString()}/${target.toLocaleString()}` : todayCount.toLocaleString();
   $('today-total-label').textContent = `completed Pomodoro${todayCount === 1 ? '' : 's'}`;
   const status = state.historySync?.status;
   $('sync-status').textContent = status === 'ready'

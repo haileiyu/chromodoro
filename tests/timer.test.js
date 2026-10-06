@@ -79,6 +79,22 @@ test('rejects invalid settings including fractions and extreme durations', () =>
   assert.deepEqual(validateSettings(DEFAULTS), DEFAULTS);
 });
 
+test('daily targets are optional, validated, and migrated without changing saved progress', () => {
+  const state = initialState();
+  delete state.settings.dailyTarget;
+  state.days['2026-10-05'] = { count: 5, minutes: 125 };
+  const before = structuredClone(state.days);
+  assert.equal(migrate(state).settings.dailyTarget, 0);
+  assert.deepEqual(state.days, before);
+  for (const dailyTarget of [0, 1, 10, 100]) {
+    state.settings = validateSettings({ ...state.settings, dailyTarget });
+    assert.equal(migrate(JSON.parse(JSON.stringify(state))).settings.dailyTarget, dailyTarget);
+  }
+  for (const dailyTarget of [-1, 1.5, 101, Infinity, 'invalid', undefined]) {
+    assert.throws(() => validateSettings({ ...state.settings, dailyTarget }), /Daily target/);
+  }
+});
+
 test('heatmap window is 53 whole Sunday-first weeks with no day skipped or repeated', () => {
   // Anchored across the US autumn DST change, where naive 86400000ms stepping drifts.
   const now = new Date(2026, 10, 4, 9).getTime();

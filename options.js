@@ -12,7 +12,7 @@ function fill(state) {
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
-  const settings = Object.fromEntries(['focus', 'shortBreak', 'longBreak', 'longEvery'].map(key => [key, Number(form.elements[key].value)]));
+  const settings = Object.fromEntries(['focus', 'shortBreak', 'longBreak', 'longEvery', 'dailyTarget'].map(key => [key, Number(form.elements[key].value)]));
   for (const key of ALERTS) settings[key] = form.elements[key].checked;
   const button = form.querySelector('[type=submit]');
   button.disabled = true;

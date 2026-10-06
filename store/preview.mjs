@@ -12,6 +12,8 @@ for (let i=350; i>=0; i--) {
   if (date.getDay()===0 || (i*17)%11<3) continue;
   const count = 1+(i*7)%8; state.days[dayKey(date)]={count,minutes:count*25};
 }
+state.settings.dailyTarget=10;
+state.days[dayKey()]={count:5,minutes:125};
 state.lastCompletion = {id:'demo',phase:'focus',endedAt:Date.now(),minutes:25};
 state.nextPhase='shortBreak';
 state.historySync={status:'ready'};
