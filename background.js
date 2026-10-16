@@ -1,4 +1,4 @@
-import { initialState, migrate, settle, toggle, badge, validateSettings, LABELS } from './timer.js';
+import { initialState, migrate, settle, toggle, badge, validateSettings, phaseAfterFocus, LABELS } from './timer.js';
 import { toolbarIcon } from './toolbar-icon.js';
 import { prepareHistory, recordCompletion, createHistorySync, SYNC_ALARM, PREFIX } from './history-sync.js';
 
@@ -62,7 +62,10 @@ async function announce(state, completion) {
       await chrome.notifications.create(`chromodoro-${completion.id}`, {
         type: 'basic', iconUrl: 'icons/icon128.png',
         title: focus ? 'Focus complete' : 'Break complete',
-        message: focus ? 'Your focus session is saved. Click the Chromodoro icon to start your break.' : 'Click the Chromodoro icon to start your next focus session.'
+        // With that break switched off, focus is queued next, not a break.
+        message: focus && state.nextPhase !== 'focus' ? 'Your focus session is saved. Click the Chromodoro icon to start your break.'
+          : focus ? 'Your focus session is saved. Click the Chromodoro icon to start your next focus session.'
+          : 'Click the Chromodoro icon to start your next focus session.'
       });
     } catch (error) { console.warn('Notification unavailable:', error); }
   }
@@ -97,9 +100,14 @@ const startFocus = state => {
   toggle(state);
 };
 const startBreak = state => {
-  state.timer = null;
   // Take the break the cycle has queued; with focus queued there is none due, so a short one.
-  if (state.nextPhase === 'focus') state.nextPhase = 'shortBreak';
+  // A break set to 0 is off, so fall back to the other one. With both off there is no break
+  // to take, so the menu item and shortcut quietly leave the current session alone.
+  const due = state.nextPhase === 'focus' ? 'shortBreak' : state.nextPhase;
+  const phase = [due, 'shortBreak', 'longBreak'].find(key => state.settings[key] > 0);
+  if (!phase) return;
+  state.timer = null;
+  state.nextPhase = phase;
   toggle(state);
 };
 const run = (action, forceSync = false) => enqueue(() => transact(action, forceSync));
@@ -148,12 +156,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'phase') {
       if (state.timer) throw new Error('Reset the current timer before changing sessions.');
       if (!Object.hasOwn(LABELS, message.phase)) throw new Error('Unknown session type.');
+      if (!(state.settings[message.phase] > 0)) throw new Error(`${LABELS[message.phase]} is turned off in Settings.`);
       state.nextPhase = message.phase;
       state.lastCompletion = null;
     }
     if (message.type === 'settings') {
       state.settings = validateSettings(message.settings);
-      if (!state.timer && state.lastCompletion?.phase === 'focus') state.nextPhase = state.cycle % state.settings.longEvery === 0 ? 'longBreak' : 'shortBreak';
+      if (!state.timer && state.lastCompletion?.phase === 'focus') state.nextPhase = phaseAfterFocus(state);
+      if (!(state.settings[state.nextPhase] > 0)) state.nextPhase = 'focus';
     }
   }, message.type === 'syncHistory').then(state => sendResponse({ ok: true, state }), error => sendResponse({ ok: false, error: error.message }));
   return true;

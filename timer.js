@@ -51,6 +51,14 @@ export function migrate(state) {
   return state;
 }
 
+// A break set to 0 minutes is switched off. It is skipped, never started as a 0 ms
+// timer that would instantly "complete" with a notification. Each break is checked on
+// its own, so short breaks can be off while the long break still comes round.
+export function phaseAfterFocus(state) {
+  const phase = state.cycle % state.settings.longEvery === 0 ? 'longBreak' : 'shortBreak';
+  return state.settings[phase] > 0 ? phase : 'focus';
+}
+
 export function remainingMs(timer, now = Date.now()) {
   if (!timer) return 0;
   return Math.max(0, timer.status === 'running' ? timer.endsAt - now : timer.remainingMs);
@@ -67,7 +75,7 @@ export function settle(state, now = Date.now()) {
     const day = state.days[key] ?? { count: 0, minutes: 0 };
     state.days[key] = { count: day.count + 1, minutes: day.minutes + t.durationMs / 60000 };
     state.cycle += 1;
-    state.nextPhase = state.cycle % state.settings.longEvery === 0 ? 'longBreak' : 'shortBreak';
+    state.nextPhase = phaseAfterFocus(state);
   } else {
     state.nextPhase = 'focus';
   }
@@ -79,6 +87,8 @@ export function settle(state, now = Date.now()) {
 export function toggle(state, now = Date.now(), id = crypto.randomUUID()) {
   const t = state.timer;
   if (!t) {
+    // Backstop: a break switched off after it was queued is skipped, not run for 0 ms.
+    if (!(state.settings[state.nextPhase] > 0)) state.nextPhase = 'focus';
     const durationMs = state.settings[state.nextPhase] * 60000;
     state.timer = { id, phase: state.nextPhase, status: 'running', durationMs, remainingMs: durationMs, endsAt: now + durationMs };
     state.lastCompletion = null;
@@ -94,9 +104,11 @@ export function toggle(state, now = Date.now(), id = crypto.randomUUID()) {
 
 export function validateSettings(input) {
   const result = {};
-  for (const [key, max] of [['focus', 180], ['shortBreak', 60], ['longBreak', 90], ['longEvery', 12]]) {
+  // Breaks may be 0 to switch them off. Focus and longEvery may not: a 0-minute focus
+  // session means nothing, and cycle % 0 is NaN, so no long break would ever come.
+  for (const [key, min, max] of [['focus', 1, 180], ['shortBreak', 0, 60], ['longBreak', 0, 90], ['longEvery', 1, 12]]) {
     const n = Number(input[key]);
-    if (!Number.isInteger(n) || n < 1 || n > max) throw new Error(`${key} must be a whole number between 1 and ${max}.`);
+    if (!Number.isInteger(n) || n < min || n > max) throw new Error(`${key} must be a whole number between ${min} and ${max}.`);
     result[key] = n;
   }
   for (const key of ALERTS) {

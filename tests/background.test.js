@@ -442,3 +442,65 @@ test('start break takes the break that is due, and abandons a live focus session
     delete globalThis.chrome;
   }
 });
+
+test('switched-off breaks are skipped without a phantom break, and cannot be started', async () => {
+  const realNow = Date.now;
+  let now = new Date(2026, 9, 15, 9).getTime();
+  Date.now = () => now;
+  const h = chromeHarness();
+  globalThis.chrome = h.chrome;
+  const finishFocus = async () => {
+    now = (await h.message({ type: 'startFocus' })).state.timer.endsAt;
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
+    return h.message({ type: 'get' });
+  };
+  try {
+    await import(`../background.js?nobreak=${Math.random()}`);
+    h.chrome.runtime.onInstalled.fire();
+    const base = (await h.message({ type: 'get' })).state.settings;
+    let result = await h.message({ type: 'settings', settings: { ...base, shortBreak: 0, newTab: false } });
+    assert.equal(result.ok, true);
+
+    // Focus completes and focus is queued: one notification, no break, and nothing more fires.
+    result = await finishFocus();
+    assert.equal(result.state.nextPhase, 'focus');
+    assert.equal(result.state.timer, null);
+    assert.equal(h.notifications.length, 1);
+    assert.match(h.notifications[0].data.message, /start your next focus session/);
+    assert.equal(h.badge.text, '');
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-tick' });
+    result = await h.message({ type: 'get' });
+    assert.equal(h.notifications.length, 1);
+    assert.equal(result.state.days[dayKey(now)].count, 1);
+
+    // A switched-off break cannot be chosen; Start break falls back to the long break.
+    result = await h.message({ type: 'phase', phase: 'shortBreak' });
+    assert.equal(result.ok, false);
+    assert.match(result.error, /Short break is turned off/);
+    result = await h.message({ type: 'startBreak' });
+    assert.equal(result.state.timer.phase, 'longBreak');
+
+    // With every break off, Start break leaves the running session alone.
+    await h.message({ type: 'startFocus' });
+    result = await h.message({ type: 'settings', settings: { ...base, shortBreak: 0, longBreak: 0, newTab: false } });
+    assert.equal(result.ok, true);
+    const running = result.state.timer;
+    h.chrome.contextMenus.onClicked.fire({ menuItemId: 'startBreak' });
+    result = await h.message({ type: 'startBreak' });
+    assert.deepEqual(result.state.timer, running);
+    assert.equal(result.state.timer.phase, 'focus');
+    assert.equal(result.state.timer.status, 'running');
+
+    // Switching a queued break off in Settings queues focus in its place.
+    result = await h.message({ type: 'settings', settings: base });
+    now = result.state.timer.endsAt;
+    h.chrome.alarms.onAlarm.fire({ name: 'chromodoro-end' });
+    result = await h.message({ type: 'get' });
+    assert.equal(result.state.nextPhase, 'shortBreak');
+    result = await h.message({ type: 'settings', settings: { ...base, shortBreak: 0 } });
+    assert.equal(result.state.nextPhase, 'focus');
+  } finally {
+    Date.now = realNow;
+    delete globalThis.chrome;
+  }
+});

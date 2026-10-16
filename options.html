@@ -24,9 +24,10 @@
         <fieldset>
           <legend>Session length</legend>
           <div class="setting-row"><label for="focus">Focus</label><span class="input-wrap"><input id="focus" name="focus" type="number" min="1" max="180" required value="25" aria-describedby="focus-unit"><span id="focus-unit">min</span></span></div>
-          <div class="setting-row"><label for="short-break">Short break</label><span class="input-wrap"><input id="short-break" name="shortBreak" type="number" min="1" max="60" required value="5" aria-describedby="short-unit"><span id="short-unit">min</span></span></div>
-          <div class="setting-row"><label for="long-break">Long break</label><span class="input-wrap"><input id="long-break" name="longBreak" type="number" min="1" max="90" required value="15" aria-describedby="long-unit"><span id="long-unit">min</span></span></div>
+          <div class="setting-row"><label for="short-break">Short break</label><span class="input-wrap"><input id="short-break" name="shortBreak" type="number" min="0" max="60" required value="5" aria-describedby="short-unit break-help"><span id="short-unit">min</span></span></div>
+          <div class="setting-row"><label for="long-break">Long break</label><span class="input-wrap"><input id="long-break" name="longBreak" type="number" min="0" max="90" required value="15" aria-describedby="long-unit break-help"><span id="long-unit">min</span></span></div>
           <div class="setting-row"><label for="long-every">Long break every</label><span class="input-wrap"><input id="long-every" name="longEvery" type="number" min="1" max="12" required value="4" aria-describedby="every-unit"><span id="every-unit">sessions</span></span></div>
+          <p id="break-help" class="muted">Set a break to 0 to skip it.</p>
         </fieldset>
         <fieldset class="goal-settings">
           <legend>Daily goal</legend>

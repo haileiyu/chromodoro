@@ -79,6 +79,54 @@ test('rejects invalid settings including fractions and extreme durations', () =>
   assert.deepEqual(validateSettings(DEFAULTS), DEFAULTS);
 });
 
+test('breaks accept 0 while focus and longEvery still need at least 1', () => {
+  assert.deepEqual(validateSettings({ ...DEFAULTS, shortBreak: 0, longBreak: 0 }), { ...DEFAULTS, shortBreak: 0, longBreak: 0 });
+  for (const key of ['shortBreak', 'longBreak']) {
+    for (const value of [-1, 0.5, 'off']) assert.throws(() => validateSettings({ ...DEFAULTS, [key]: value }), new RegExp(`${key} must be a whole number between 0 and`));
+  }
+  for (const key of ['focus', 'longEvery']) {
+    assert.throws(() => validateSettings({ ...DEFAULTS, [key]: 0 }), new RegExp(`${key} must be a whole number between 1 and`));
+  }
+});
+
+test('a break set to 0 is skipped, never started, and the long-break schedule holds', () => {
+  const run = (settings, cycles) => {
+    const s = initialState();
+    s.settings = { ...DEFAULTS, ...settings };
+    let now = new Date(2026, 8, 5, 10).getTime();
+    const phases = [];
+    while (phases.filter(phase => phase === 'focus').length < cycles) {
+      toggle(s, now, `session-${phases.length}`);
+      assert.ok(s.timer.durationMs > 0);
+      phases.push(s.timer.phase);
+      now = s.timer.endsAt;
+      settle(s, now);
+    }
+    return { s, phases, now };
+  };
+  const S = 'shortBreak', L = 'longBreak', F = 'focus';
+  assert.deepEqual(run({ shortBreak: 0 }, 5).phases, [F, F, F, F, L, F]);
+  assert.deepEqual(run({ longBreak: 0 }, 5).phases, [F, S, F, S, F, S, F, F]);
+  const off = run({ shortBreak: 0, longBreak: 0 }, 8);
+  assert.deepEqual(off.phases, Array(8).fill(F));
+  assert.equal(off.s.cycle, 8);
+  assert.equal(off.s.days[dayKey(off.now)].count, 8);
+  // Breaks only ever change what is queued next, so turning one back on applies at once.
+  off.s.settings = { ...DEFAULTS };
+  toggle(off.s, off.now, 'ninth');
+  settle(off.s, off.s.timer.endsAt);
+  assert.equal(off.s.nextPhase, 'shortBreak');
+});
+
+test('starting a queued break that was switched off starts focus instead', () => {
+  const s = initialState();
+  s.nextPhase = 'longBreak';
+  s.settings = { ...DEFAULTS, longBreak: 0 };
+  toggle(s, 0, 'session');
+  assert.equal(s.timer.phase, 'focus');
+  assert.equal(s.timer.durationMs, 25 * 60000);
+});
+
 test('daily targets are optional, validated, and migrated without changing saved progress', () => {
   const state = initialState();
   delete state.settings.dailyTarget;
