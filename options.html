@@ -31,7 +31,7 @@
         <fieldset class="goal-settings">
           <legend>Daily goal</legend>
           <div class="setting-row"><label for="daily-target">Pomodoro target</label><span class="input-wrap"><input id="daily-target" name="dailyTarget" type="number" min="0" max="100" step="1" required value="0" aria-describedby="target-unit target-help"><span id="target-unit">sessions</span></span></div>
-          <p id="target-help" class="muted">Completed focus sessions count toward your goal each day. Set to 0 for no target.</p>
+          <p id="target-help" class="muted">Set to 0 for no target.</p>
         </fieldset>
         <fieldset class="notification-settings">
           <legend>When a session ends</legend>
@@ -48,7 +48,7 @@
           <div class="setting-row"><dt>Start break</dt><dd id="shortcut-break">Loading…</dd></div>
         </dl>
         <p class="muted">If a shortcut is unassigned or conflicts with another app, choose different keys in Chrome.</p>
-        <button id="customize-shortcuts" type="button" class="button">Customize shortcuts</button>
+        <div class="settings-actions"><button id="customize-shortcuts" type="button" class="button primary">Customize shortcuts</button></div>
         <p id="shortcut-error" role="status" class="muted" hidden></p>
       </section>
       <p class="privacy-link"><a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>

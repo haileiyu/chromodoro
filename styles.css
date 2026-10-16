@@ -99,7 +99,6 @@ legend { font-size: 1.125rem; font-weight: 500; padding: 0; margin-bottom: 8px; 
 .shortcut-settings > p { margin-top: 12px; }
 .shortcut-list { margin: 12px 0; }
 .shortcut-list dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
-.shortcut-settings .button { margin-top: 18px; }
 .privacy-link { margin-top: 34px; color: var(--muted); }
 .privacy-link a { text-underline-offset: 3px; }
 #error { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; background: #852e21; color: #fff; padding: 12px 20px; border-radius: 8px; width: max-content; max-width: calc(100% - 32px); overflow-wrap: anywhere; box-shadow: 0 5px 25px #0002; }
