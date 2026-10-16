@@ -1,10 +1,10 @@
 # Chrome Web Store listing — Chromodoro
 
-Last updated: October 1, 2026. This is the source for the store listing and reviewer details; `../PRIVACY.md` is the public privacy policy.
+Last updated: October 6, 2026. This is the source for the store listing and reviewer details; `../PRIVACY.md` is the public privacy policy.
 
 ## Release status
 
-The repository is at version `1.1.0`. Confirm the submitted or published version in the Chrome Web Store Developer Dashboard before uploading an update. Use `chromodoro.contact@gmail.com` as the public contact email and verify it in the dashboard. The intended launch settings are Free, Public, and All regions; confirm them there before submission.
+The repository is at version `1.2.1`. The public listing showed 1.2.0 on October 6, 2026; confirm the uploaded version in the Chrome Web Store Developer Dashboard before uploading an update. Use `chromodoro.contact@gmail.com` as the public contact email and verify it in the dashboard. The intended launch settings are Free, Public, and All regions; confirm them there before submission.
 
 Release notes are in [`RELEASE_NOTES.md`](RELEASE_NOTES.md). Follow [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) for the prepared files, verification results, and remaining store checks. This is a prepared release, not a confirmation of submission or publication.
 
@@ -95,6 +95,8 @@ Timer settings and daily focus totals are stored locally. Recent daily focus act
 
 | Version | Date | Summary | Store status |
 | --- | --- | --- | --- |
+| 1.2.1 | Prepared October 6, 2026 | Bundled gray idle icons; timer and alarms no longer wait for toolbar updates | Prepared; dashboard status to confirm |
+| 1.2.0 | Prepared October 6, 2026 | Daily Pomodoro goal, today's completed count, and start focus/break keyboard shortcuts | Prepared; dashboard status to confirm |
 | 1.1.0 | Prepared October 1, 2026 | Chrome account history sync, local archives and sync status; redesigned History, Settings, and completion pages; includes the previously unreleased icon, contact, and Sheets-backup removal changes | Prepared; dashboard status to confirm |
 | 1.0.0 | To confirm | Toolbar Pomodoro timer and local history | To confirm in Developer Dashboard |
 

@@ -2,7 +2,7 @@
 
 本文件说明每份材料的用途。英文商店文案、权限理由和审核员测试说明统一维护在 `store/listing.md`，提交时从那里复制，以免出现多个版本。
 
-本次更新准备为 **1.1.0**。完整检查清单见 `store/RELEASE_CHECKLIST.md`，更新说明见 `store/RELEASE_NOTES.md`。新生成的整套素材包已包含单独的 `icons/icon128.png`；请使用新 ZIP，不要沿用旧的解压文件夹。
+本次更新准备为 **1.2.1**。完整检查清单见 `store/RELEASE_CHECKLIST.md`，更新说明见 `store/RELEASE_NOTES.md`。新生成的整套素材包已包含单独的 `icons/icon128.png`；请使用新 ZIP，不要沿用旧的解压文件夹。
 
 ## 先准备账号与隐私政策网址
 
@@ -15,7 +15,7 @@
 
 | 后台位置 | 填写内容 |
 | --- | --- |
-| 已有条目 → Package → Upload New Package | 上传 `release/chromodoro-1.1.0.zip`；不要上传整套素材包。更新使用原条目；仅首次发布使用 Add new item |
+| 已有条目 → Package → Upload New Package | 上传 `release/chromodoro-1.2.1.zip`；不要上传整套素材包。更新使用原条目；仅首次发布使用 Add new item |
 | Store listing → 名称、简短说明、详细说明 | 从 `store/listing.md` 的 Name、Short description、Detailed description 复制 |
 | Store listing → Category / Language | Productivity / English |
 | Store listing → 图标 | `icons/icon128.png` |
@@ -41,7 +41,7 @@
 - 用无痕窗口确认隐私政策网址可访问，内容与 `PRIVACY.md` 相同。
 - 确认开发者后台的公开联系邮箱、发布者名称和 Non-Trader 状态。
 - 确认图片尺寸与界面一致；历史截图中的数据明确标为 **Example history**。
-- 确认后台中若已有旧版本，待上传版本号必须高于已发布版本；本包版本是 `1.1.0`。
+- 确认后台中若已有旧版本，待上传版本号必须高于已发布版本；本包版本是 `1.2.1`。
 - 上传后完成 Store listing、Privacy practices、Distribution 和 Test instructions，再点击 **Submit for Review**。可选择审核通过后自动发布，或选择延迟发布后手动上线。
 
 官方说明：[发布流程](https://developer.chrome.com/docs/webstore/publish)、[隐私字段](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)、[图片规格](https://developer.chrome.com/docs/webstore/images)、[发布范围](https://developer.chrome.com/docs/webstore/cws-dashboard-distribution)。

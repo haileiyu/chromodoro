@@ -3,17 +3,6 @@ import assert from 'node:assert/strict';
 import { dayKey, initialState } from '../timer.js';
 import { PREFIX } from '../history-sync.js';
 
-// Canvas and bitmap decoding are supplied by Chrome in the worker.
-globalThis.createImageBitmap = async () => ({ close() {} });
-globalThis.OffscreenCanvas = class {
-  getContext() {
-    return { drawImage() {}, getImageData: () => ({ data: new Uint8ClampedArray([195, 79, 53, 255]) }) };
-  }
-};
-const nativeFetch = globalThis.fetch;
-globalThis.fetch = (url, options) => url.startsWith('chrome-extension://')
-  ? Promise.resolve({ blob: async () => new Blob() }) : nativeFetch(url, options);
-
 // Chrome API contract harness: persistent storage survives worker re-imports.
 function chromeHarness(persisted = {}, synced = {}) {
   const event = () => ({ listeners: [], addListener(fn) { this.listeners.push(fn); }, fire(...args) { this.listeners.forEach(fn => fn(...args)); } });
@@ -60,6 +49,28 @@ function chromeHarness(persisted = {}, synced = {}) {
   const message = data => new Promise(resolve => chrome.runtime.onMessage.listeners[0](data, { id: chrome.runtime.id }, resolve));
   return { chrome, persisted, synced, alarms, notifications, badge, menus, tabs, focused, message };
 }
+
+test('unavailable toolbar updates do not block focus and break alarms', async () => {
+  const h = chromeHarness();
+  h.chrome.action.setIcon = () => new Promise(() => {});
+  h.chrome.action.setBadgeText = () => new Promise(() => {});
+  globalThis.chrome = h.chrome;
+  const promptly = promise => Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Icon blocked a timer action')), 250))
+  ]);
+  try {
+    await import(`../background.js?icon-unavailable=${Math.random()}`);
+    const focus = await promptly(h.message({ type: 'startFocus' }));
+    assert.equal(focus.state.timer.phase, 'focus');
+    assert.equal(h.alarms.get('chromodoro-end').scheduledTime, focus.state.timer.endsAt);
+    const rest = await promptly(h.message({ type: 'startBreak' }));
+    assert.equal(rest.state.timer.phase, 'shortBreak');
+    assert.equal(h.alarms.get('chromodoro-end').scheduledTime, rest.state.timer.endsAt);
+  } finally {
+    delete globalThis.chrome;
+  }
+});
 
 test('keyboard commands replace sessions and serialize with completion alarms', async () => {
   const realNow = Date.now;
@@ -214,7 +225,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     assert.deepEqual(h.focused.filter(entry => entry.active).map(entry => entry.id), [1, 1]);
     assert.equal(h.focused.filter(entry => entry.focused).length, 2);
     assert.equal(h.badge.text, '');
-    assert.ok(h.badge.icon.imageData);
+    assert.equal(h.badge.icon.path[16], 'icons/idle16.png');
     h.chrome.action.onClicked.fire();
     let result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.status, 'running');
@@ -228,7 +239,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     h.chrome.action.onClicked.fire();
     result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.status, 'paused');
-    assert.ok(h.badge.icon.imageData);
+    assert.equal(h.badge.icon.path[16], 'icons/idle16.png');
     assert.equal(h.badge.color, '#77736B');
     assert.deepEqual([...h.alarms.keys()], ['chromodoro-history-sync']);
     now += 60 * 60000;
@@ -238,7 +249,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     await import(`../background.js?second=${Math.random()}`);
     result = await h.message({ type: 'get' });
     assert.equal(result.state.timer.remainingMs, 16 * 60000);
-    assert.ok(h.badge.icon.imageData);
+    assert.equal(h.badge.icon.path[16], 'icons/idle16.png');
     h.chrome.action.onClicked.fire();
     result = await h.message({ type: 'get' });
     assert.equal(h.alarms.get('chromodoro-end').scheduledTime, now + 16 * 60000);
@@ -259,7 +270,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     assert.deepEqual([...h.alarms.keys()], ['chromodoro-history-sync']);
     assert.equal(h.badge.text, '');
     assert.equal(h.badge.color, '#77736B');
-    assert.ok(h.badge.icon.imageData);
+    assert.equal(h.badge.icon.path[16], 'icons/idle16.png');
     await h.message({ type: 'toggle' });
     result = await h.message({ type: 'reset' });
     assert.equal(result.state.timer, null);

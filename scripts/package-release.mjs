@@ -15,7 +15,7 @@ const files = [
   'manifest.json', 'background.js', 'timer.js', 'toolbar-icon.js', 'history-sync.js',
   'page.js', 'styles.css', 'options.html', 'options.js', 'history.html', 'history.js',
   'alert.html', 'alert.js', 'privacy.html', 'PRIVACY.md',
-  ...[16, 32, 48, 128].map(size => `icons/icon${size}.png`)
+  ...[16, 32, 48, 128].flatMap(size => [`icons/icon${size}.png`, `icons/idle${size}.png`])
 ];
 const release = join(root, 'release');
 mkdirSync(release, { recursive: true });

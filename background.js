@@ -16,13 +16,14 @@ function enqueue(task) {
 
 async function syncChrome(state) {
   const view = badge(state);
-  await Promise.all([
-    toolbarIcon(state.timer?.status !== 'running').then(icon => chrome.action.setIcon(icon)),
+  // Toolbar presentation must never hold up a session or its completion alarms.
+  void Promise.resolve().then(() => Promise.all([
+    chrome.action.setIcon(toolbarIcon(state.timer?.status !== 'running')),
     chrome.action.setBadgeText({ text: view.text }),
     chrome.action.setBadgeBackgroundColor({ color: view.color }),
     chrome.action.setBadgeTextColor({ color: '#FFFFFF' }),
     chrome.action.setTitle({ title: view.title })
-  ]);
+  ])).catch(error => console.warn('Toolbar update unavailable:', error));
   if (state.timer?.status === 'running') {
     const [end, tick] = await Promise.all([chrome.alarms.get(END), chrome.alarms.get(TICK)]);
     if (!end || end.scheduledTime !== state.timer.endsAt) await chrome.alarms.create(END, { when: state.timer.endsAt });

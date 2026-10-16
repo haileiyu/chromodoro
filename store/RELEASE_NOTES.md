@@ -1,3 +1,32 @@
+# Chromodoro 1.2.1
+
+Prepared October 6, 2026. Publication date is pending.
+
+## Fixes
+
+- The idle icon is bundled in gray, so it appears correctly even before the background worker starts.
+- Toolbar updates can no longer delay starting a focus session or break or scheduling its completion alarm.
+
+No new permissions are requested. Existing settings and history are kept.
+
+---
+
+# Chromodoro 1.2.0
+
+Prepared October 6, 2026. Publication date is pending.
+
+## What's new
+
+- Set a daily Pomodoro goal in Settings and track progress toward it. Set the target to 0 for no goal.
+- See how many Pomodoros you've completed today on the completion page and History.
+- Start focusing or start a break with keyboard shortcuts (Ctrl+Shift+8 / Ctrl+Shift+9, or Command+Shift+8 / Command+Shift+9 on Mac). Shortcuts can be changed in Chrome's extension shortcut settings.
+
+## Upgrade details
+
+No new permissions are requested compared with 1.1.0. Existing settings and history are kept; the daily goal defaults to off.
+
+---
+
 # Chromodoro 1.1.0
 
 Prepared October 1, 2026. Publication date is pending.

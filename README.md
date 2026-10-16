@@ -79,7 +79,7 @@ For a manual cross-device check, install this version with the same extension ID
 - `options.html`, `options.js`: the settings page.
 - `page.js`, `styles.css`: helpers and styles shared by both pages.
 - `alert.html`, `alert.js`: the end-of-session tab.
-- `icons/`: transparent PNG logo (`logo.png`) and bundled 16, 32, 48, and 128 pixel icons (`icon<size>.png`) derived from it. The size variants trim excess transparent margins so the tomato fills the toolbar icon. Pages, notifications, and the toolbar share these icons; paused and idle toolbar icons are generated in grayscale at runtime.
+- `icons/`: transparent PNG logo (`logo.png`) and bundled 16, 32, 48, and 128 pixel red (`icon<size>.png`) and gray (`idle<size>.png`) icons. The red icons are used during an active timer; the gray icons are used while idle or paused.
 - `tests/`: timer and mocked Chrome API integration tests. Run `npm test` with Node 20+; no dependencies need installing.
 
 The automated tests cover badge rounding, pause/resume, serialization, midnight completion, duplicate events, break cycles, settings, worker restart recovery, simultaneous events, alert settings, migration of pre-existing stored settings, removal of obsolete backup credentials, offline merges, duplicate and reordered sync updates, retention boundaries, quota failures, and archive-before-delete behavior. They simulate Chrome APIs; a local unpacked installation is the final check for real toolbar rendering and OS notifications.
@@ -92,7 +92,7 @@ Built using Chrome’s documented [Action API](https://developer.chrome.com/docs
 
 Run `npm test`, then `npm run package` to create `release/chromodoro-<version>.zip` and `release/chromodoro-store-upload-kit.zip`. Packaging requires matching versions in `manifest.json` and `package.json`. The extension package uses an explicit file list and includes all runtime assets and the privacy policy; development files and sample history are excluded. Upload only the extension ZIP to the existing item's Package tab in the Developer Dashboard. The separate kit contains the extension ZIP, store icon, screenshots, listing copy, privacy policy, checksum, release notes, release checklist, and a Chinese submission guide.
 
-See [`store/RELEASE_NOTES.md`](store/RELEASE_NOTES.md) for the 1.1.0 changes and [`store/RELEASE_CHECKLIST.md`](store/RELEASE_CHECKLIST.md) for verification and remaining submission steps.
+See [`store/RELEASE_NOTES.md`](store/RELEASE_NOTES.md) for the 1.2.1 changes and [`store/RELEASE_CHECKLIST.md`](store/RELEASE_CHECKLIST.md) for verification and remaining submission steps.
 
 Store copy, permission explanations, and reviewer instructions are in [`store/listing.md`](store/listing.md). Store images are in `store/assets/`: three 1280×800 screenshots and a 440×280 promotional tile. The history screenshot uses labeled example data rendered by the real history page. `node store/preview.mjs` runs the local-only asset preview; it is not part of the extension package.
 

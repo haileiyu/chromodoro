@@ -8,6 +8,11 @@ const read = path => readFileSync(new URL(path, root), 'utf8');
 test('history and options are separate pages, and every local file they load exists', () => {
   const manifest = JSON.parse(read('manifest.json'));
   assert.equal(manifest.options_ui.page, 'options.html');
+  for (const [size, path] of Object.entries(manifest.action.default_icon)) {
+    assert.equal(path, `icons/idle${size}.png`);
+    assert.ok(existsSync(new URL(path, root)), `Missing default icon ${path}`);
+    assert.ok(existsSync(new URL(`icons/icon${size}.png`, root)));
+  }
   assert.match(read('background.js'), /getURL\('history\.html'\)/);
   for (const page of ['history.html', 'options.html', 'alert.html']) {
     const html = read(page);
