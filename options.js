@@ -2,26 +2,46 @@ import { ALERTS } from './timer.js';
 import { $, report, request } from './page.js';
 
 const form = $('settings-form');
+const button = $('save-settings');
+let saved;
+
+function read() {
+  const settings = Object.fromEntries(['focus', 'shortBreak', 'longBreak', 'longEvery', 'dailyTarget'].map(key => [key, Number(form.elements[key].value)]));
+  for (const key of ALERTS) settings[key] = form.elements[key].checked;
+  return settings;
+}
+
+// Highlight Save only while the form differs from the stored settings.
+function markChanges() {
+  button.classList.toggle('primary', saved !== undefined && JSON.stringify(read()) !== saved);
+}
 
 function fill(state) {
   for (const [key, value] of Object.entries(state.settings)) {
     if (typeof value === 'boolean') form.elements[key].checked = value;
     else form.elements[key].value = value;
   }
+  saved = JSON.stringify(read());
+  markChanges();
 }
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
-  const settings = Object.fromEntries(['focus', 'shortBreak', 'longBreak', 'longEvery', 'dailyTarget'].map(key => [key, Number(form.elements[key].value)]));
-  for (const key of ALERTS) settings[key] = form.elements[key].checked;
-  const button = form.querySelector('[type=submit]');
+  const settings = read();
   button.disabled = true;
   try {
     await request('settings', { settings });
+    saved = JSON.stringify(settings);
     $('save-status').textContent = 'Saved';
-  } catch (error) { report(error); } finally { button.disabled = false; }
+  } catch (error) { report(error); } finally {
+    button.disabled = false;
+    markChanges();
+  }
 });
-form.addEventListener('input', () => { $('save-status').textContent = ''; });
+form.addEventListener('input', () => {
+  $('save-status').textContent = '';
+  markChanges();
+});
 request('get').then(fill).catch(report);
 
 async function refreshShortcuts() {

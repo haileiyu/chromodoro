@@ -14,31 +14,68 @@ test('shortcut defaults are Chrome-only with explicit Mac bindings', () => {
   }
 });
 
-test('settings shows live bindings, refreshes after editing, and opens customization', async () => {
+function loadOptions({ commands = () => [], openTab = async () => {}, saveSettings = async () => {} } = {}) {
   const elements = new Map();
   const $ = id => {
     if (!elements.has(id)) elements.set(id, {
-      textContent: '', hidden: true, listeners: {},
+      textContent: '', hidden: true, listeners: {}, classes: new Set(),
+      classList: { toggle(name, on) { on ? this.owner.classes.add(name) : this.owner.classes.delete(name); } },
       addEventListener(type, fn) { this.listeners[type] = fn; }
     });
-    return elements.get(id);
+    const element = elements.get(id);
+    element.classList.owner = element;
+    return element;
   };
   const state = initialState();
   $('settings-form').elements = Object.fromEntries(Object.keys(state.settings).map(key => [key, {}]));
-  let commands = [{ name: 'startFocus', shortcut: 'Alt+Shift+F' }, { name: 'startBreak', shortcut: '' }];
-  let failRead = false, failOpen = false, onFocus, onVisibility;
-  const opened = [], errors = [];
+  const errors = [], handlers = {};
   const source = readFileSync(new URL('../options.js', import.meta.url), 'utf8');
   runInNewContext(source.replace(/^import .*;\n/gm, ''), {
-    $, ALERTS, request: async () => state, report: error => errors.push(error),
-    chrome: {
-      commands: { async getAll() { if (failRead) throw new Error('Unavailable'); return commands; } },
-      tabs: { async create({ url }) { if (failOpen) throw new Error('Unavailable'); opened.push(url); } }
-    },
-    window: { addEventListener: (type, fn) => { if (type === 'focus') onFocus = fn; } },
-    document: { hidden: false, addEventListener: (type, fn) => { if (type === 'visibilitychange') onVisibility = fn; } }
+    $, ALERTS, report: error => errors.push(error),
+    request: async (type, payload) => type === 'settings' ? saveSettings(payload) : state,
+    chrome: { commands: { getAll: async () => commands() }, tabs: { create: openTab } },
+    window: { addEventListener: (type, fn) => { if (type === 'focus') handlers.focus = fn; } },
+    document: { hidden: false, addEventListener: (type, fn) => { if (type === 'visibilitychange') handlers.visibility = fn; } }
   });
-  const settled = () => new Promise(resolve => setImmediate(resolve));
+  return { $, errors, handlers };
+}
+
+const settled = () => new Promise(resolve => setImmediate(resolve));
+
+test('save is highlighted only while settings have unsaved changes', async () => {
+  let failSave = false;
+  const { $, errors } = loadOptions({ saveSettings: async () => { if (failSave) throw new Error('Unavailable'); } });
+  const form = $('settings-form'), save = $('save-settings');
+  const edit = (key, value) => { form.elements[key].value = value; form.listeners.input(); };
+  await settled();
+  assert.equal(save.classes.has('primary'), false);
+  edit('focus', '30');
+  assert.equal(save.classes.has('primary'), true);
+  edit('focus', '25');
+  assert.equal(save.classes.has('primary'), false);
+  form.elements.notify.checked = !form.elements.notify.checked;
+  form.listeners.input();
+  assert.equal(save.classes.has('primary'), true);
+
+  failSave = true;
+  await form.listeners.submit({ preventDefault() {} });
+  assert.equal(save.classes.has('primary'), true);
+  assert.equal(errors.length, 1);
+  failSave = false;
+  await form.listeners.submit({ preventDefault() {} });
+  assert.equal(save.classes.has('primary'), false);
+  assert.equal($('save-status').textContent, 'Saved');
+});
+
+test('settings shows live bindings, refreshes after editing, and opens customization', async () => {
+  let commands = [{ name: 'startFocus', shortcut: 'Alt+Shift+F' }, { name: 'startBreak', shortcut: '' }];
+  let failRead = false, failOpen = false;
+  const opened = [];
+  const { $, errors, handlers } = loadOptions({
+    commands: () => { if (failRead) throw new Error('Unavailable'); return commands; },
+    openTab: async ({ url }) => { if (failOpen) throw new Error('Unavailable'); opened.push(url); }
+  });
+  const onFocus = () => handlers.focus(), onVisibility = () => handlers.visibility();
   await settled();
   assert.equal($('shortcut-focus').textContent, 'Alt+Shift+F');
   assert.equal($('shortcut-break').textContent, 'Not assigned');

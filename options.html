@@ -38,7 +38,7 @@
           <label class="setting-row toggle-row" for="notify"><span>Show a notification</span><input class="toggle" id="notify" name="notify" type="checkbox" role="switch"></label>
           <label class="setting-row toggle-row" for="new-tab"><span>Open a new tab</span><input class="toggle" id="new-tab" name="newTab" type="checkbox" role="switch"></label>
         </fieldset>
-        <div class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button type="submit" class="button primary">Save changes</button></div>
+        <div class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button id="save-settings" type="submit" class="button">Save changes</button></div>
       </form>
       <section class="shortcut-settings" aria-labelledby="shortcuts-heading">
         <h2 id="shortcuts-heading">Keyboard shortcuts</h2>
@@ -48,7 +48,7 @@
           <div class="setting-row"><dt>Start break</dt><dd id="shortcut-break">Loading…</dd></div>
         </dl>
         <p class="muted">If a shortcut is unassigned or conflicts with another app, choose different keys in Chrome.</p>
-        <div class="settings-actions"><button id="customize-shortcuts" type="button" class="button primary">Customize shortcuts</button></div>
+        <div class="settings-actions"><button id="customize-shortcuts" type="button" class="button">Customize shortcuts</button></div>
         <p id="shortcut-error" role="status" class="muted" hidden></p>
       </section>
       <p class="privacy-link"><a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>

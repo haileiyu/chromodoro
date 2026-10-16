@@ -95,6 +95,8 @@ legend { font-size: 1.125rem; font-weight: 500; padding: 0; margin-bottom: 8px; 
 .toggle:checked::after { left: calc(1.0625rem - 1px); }
 .settings-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 24px; }
 .save-status { color: var(--muted); }
+/* Same size outlined or filled, so marking unsaved changes never shifts the layout. */
+.settings-actions .button { padding: .5625rem 1.0625rem; font-weight: 500; }
 .shortcut-settings { max-width: 43rem; margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--line); }
 .shortcut-settings > p { margin-top: 12px; }
 .shortcut-list { margin: 12px 0; }
