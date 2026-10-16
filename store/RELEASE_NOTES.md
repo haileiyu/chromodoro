@@ -1,3 +1,23 @@
+# Chromodoro 1.3.0
+
+Prepared October 15, 2026. Publication date is pending.
+
+## What's new
+
+- Dark mode. History, Settings, and the completion page follow Chrome's light or dark mode. To always use one, choose Light or Dark in Settings → Appearance.
+- Set a short or long break to 0 to skip it. With short breaks at 0, focus sessions run back to back and the long break still comes after your chosen number of sessions. With both at 0, Chromodoro only times focus.
+
+## Changes
+
+- Save changes in Settings is highlighted only when you have unsaved changes.
+- After a focus session, the notification names what comes next, so it no longer mentions a break that is turned off.
+
+## Upgrade details
+
+No new permissions are requested compared with 1.2.1. Existing settings and history are kept. The theme starts on System, and break lengths are unchanged.
+
+---
+
 # Chromodoro 1.2.1
 
 Prepared October 6, 2026. Publication date is pending.

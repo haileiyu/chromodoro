@@ -1,10 +1,10 @@
 # Chrome Web Store listing — Chromodoro
 
-Last updated: October 6, 2026. This is the source for the store listing and reviewer details; `../PRIVACY.md` is the public privacy policy.
+Last updated: October 15, 2026. This is the source for the store listing and reviewer details; `../PRIVACY.md` is the public privacy policy.
 
 ## Release status
 
-The repository is at version `1.2.1`. The public listing showed 1.2.0 on October 6, 2026; confirm the uploaded version in the Chrome Web Store Developer Dashboard before uploading an update. Use `chromodoro.contact@gmail.com` as the public contact email and verify it in the dashboard. The intended launch settings are Free, Public, and All regions; confirm them there before submission.
+The repository is at version `1.3.0`. The public listing showed 1.2.0 on October 6, 2026; confirm the uploaded version in the Chrome Web Store Developer Dashboard before uploading an update. Use `chromodoro.contact@gmail.com` as the public contact email and verify it in the dashboard. The intended launch settings are Free, Public, and All regions; confirm them there before submission.
 
 Release notes are in [`RELEASE_NOTES.md`](RELEASE_NOTES.md). Follow [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) for the prepared files, verification results, and remaining store checks. This is a prepared release, not a confirmation of submission or publication.
 
@@ -20,7 +20,7 @@ Start a focus session with one click. Chromodoro keeps the remaining minutes on 
 Click the icon to start, pause, or resume. Right-click to start focusing, take a break, or view your Pomodoro history. The icon is gray when the timer is idle.
 
 TIMER AND BREAKS
-• Adjustable focus, short-break, and long-break durations.
+• Adjustable focus, short-break, and long-break durations. Set a break to 0 to skip it.
 • A long break after your chosen number of completed focus sessions.
 • Optional system notifications and a completion tab, independently configurable.
 • Paused timers survive browser restarts. Running timers use elapsed time, including time while your computer sleeps.
@@ -35,7 +35,7 @@ HISTORY ACROSS DEVICES
 Your history is saved locally. With Chrome Sync enabled for extensions on the same Google account, the most recent 24 calendar months of daily totals are shared through Google across instances of this extension. Offline changes share after reconnecting. Older records stay on devices that have them and remain available for CSV export. Chrome storage limits can delay sharing; check the history page for status. Timers and settings remain independent on each device. No account is required for the timer. Chromodoro does not read browsing history or page content and includes no advertising or analytics trackers.
 
 GET STARTED
-Pin Chromodoro in Chrome's Extensions menu, then click its toolbar icon. Open Options from the extension's right-click menu to customize your sessions and alerts.
+Pin Chromodoro in Chrome's Extensions menu, then click its toolbar icon. Open Options from the extension's right-click menu to customize your sessions, alerts, and light or dark theme.
 
 Support: chromodoro.contact@gmail.com
 
@@ -95,6 +95,7 @@ Timer settings and daily focus totals are stored locally. Recent daily focus act
 
 | Version | Date | Summary | Store status |
 | --- | --- | --- | --- |
+| 1.3.0 | Prepared October 15, 2026 | Dark mode with an Appearance setting; breaks can be set to 0 to skip them; Save changes highlights unsaved settings | Prepared; dashboard status to confirm |
 | 1.2.1 | Prepared October 6, 2026 | Bundled gray idle icons; timer and alarms no longer wait for toolbar updates | Prepared; dashboard status to confirm |
 | 1.2.0 | Prepared October 6, 2026 | Daily Pomodoro goal, today's completed count, and start focus/break keyboard shortcuts | Prepared; dashboard status to confirm |
 | 1.1.0 | Prepared October 1, 2026 | Chrome account history sync, local archives and sync status; redesigned History, Settings, and completion pages; includes the previously unreleased icon, contact, and Sheets-backup removal changes | Prepared; dashboard status to confirm |

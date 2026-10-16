@@ -1,12 +1,12 @@
 # Chromodoro Privacy Policy
 
-Effective date: October 1, 2026
+Effective date: October 15, 2026
 
 Chromodoro is a Pomodoro timer extension. This policy explains how the extension handles information when you use the timer, view your history, or export a CSV.
 
 ## Information stored on your computer
 
-Chromodoro stores timer state, settings, daily completed Pomodoro counts, and daily focus-minute totals in Chrome's local extension storage. Timer state includes session identifiers and timing information needed to resume and complete a session. Active timers, break cycles, and settings remain specific to each device. Local history also includes records received from your other Chrome instances.
+Chromodoro stores timer state, settings, daily completed Pomodoro counts, and daily focus-minute totals in Chrome's local extension storage. Your light or dark theme choice is kept in the extension's own page storage on that device and is never synced or sent anywhere. Timer state includes session identifiers and timing information needed to resume and complete a session. Active timers, break cycles, and settings remain specific to each device. Local history also includes records received from your other Chrome instances.
 
 ## Chrome account sync
 

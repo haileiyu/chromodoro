@@ -1,29 +1,31 @@
-# Chromodoro 1.2.1 release checklist
+# Chromodoro 1.3.0 release checklist
 
-Prepared October 6, 2026. Local materials are prepared; this does not record a store submission or publication.
+Prepared October 15, 2026. Local materials are prepared; this does not record a store submission or publication.
 
 ## Files to use
 
-- Upload `release/chromodoro-1.2.1.zip` to the existing item's **Package → Upload New Package** in the Chrome Web Store Developer Dashboard.
+- Upload `release/chromodoro-1.3.0.zip` to the existing item's **Package → Upload New Package** in the Chrome Web Store Developer Dashboard.
 - `release/chromodoro-store-upload-kit.zip` is the complete handoff bundle. Extract it for the listing copy, reviewer instructions, privacy policy, release notes, store icon, screenshots, and promotional tile. Do not upload this outer ZIP as the extension.
 - `release/SHA256SUMS` verifies the extension ZIP. From the repository root or extracted kit root, run `shasum -a 256 -c release/SHA256SUMS`.
 - Use the newly generated ZIPs; an older extracted `release/chromodoro-store-upload-kit/` folder may contain stale materials.
 
 ## Local verification
 
-- [x] All 34 automated tests passed, including stalled toolbar updates that must not block focus or break alarms.
-- [x] Manifest and package metadata both identify version 1.2.1.
-- [x] History, Settings, and completion store screenshots recaptured from the current pages with preview-only example data; full controls are visible.
+- [x] All 43 automated tests passed, including breaks set to 0, the theme setting, and a check that every script a page loads is packaged.
+- [x] Manifest and package metadata both identify version 1.3.0.
+- [x] History, Settings, and completion pages checked in light and dark mode with headless Chrome screenshots of the local preview.
 - [x] Three screenshots are 1280×800 JPEGs, the promotional tile is 440×280 PNG, and the store icon is 128×128 PNG.
 - [x] Release notes, listing copy, permission explanations, and English/Chinese submission guidance prepared.
+- [x] Privacy policy updated (effective October 15, 2026) to cover the device-only theme choice.
 
 The browser screenshots use a local preview that simulates extension APIs. They do not verify real Chrome account delivery or operating-system notifications.
 
 ## Before submitting
 
-- [ ] Confirm the existing store item's published and uploaded versions are below 1.2.1. The public listing showed 1.2.0 on October 6, 2026.
+- [ ] Confirm the existing store item's published and uploaded versions are below 1.3.0. The public listing showed 1.2.0 on October 6, 2026.
+- [ ] Recapture `store/assets/settings-1280x800.jpg`. It dates from October 1 and does not show the daily goal, break help, or Appearance setting. Store screenshots stay light; the preview pins the theme.
 - [ ] Publish or update the public privacy-policy page to match `PRIVACY.md`, including Chrome Sync. Confirm it is accessible without signing in and enter its URL in Privacy practices. The repository does not yet record a verified public URL.
-- [ ] On a real Chrome installation, export existing history, update/reload without uninstalling, and verify the history remains. Set Focus to 1 minute; start, pause, resume, and complete it. Confirm one completion, gray idle icon, completion tab, and notification when enabled. Check CSV export and restore the preferred focus duration.
+- [ ] On a real Chrome installation, export existing history, update/reload without uninstalling, and verify the history remains. Set Focus to 1 minute; start, pause, resume, and complete it. Confirm one completion, gray idle icon, completion tab, and notification when enabled. Check CSV export and restore the preferred focus duration. Set Short break to 0, complete a focus session, and confirm focus is queued with no break notification. Switch Settings → Appearance between System, Light, and Dark and confirm History, Settings, and the completion tab follow it without a white flash.
 - [ ] Complete the two-device sync check in `README.md`: same extension ID/account, one completion on each device including one offline, then reconnect and verify combined totals without duplication after restart. Confirm timers remain independent.
 - [ ] Update the existing listing with `store/listing.md` and the supplied images. Review the changed Chrome Sync data-use disclosures against the dashboard's current definitions.
 - [ ] Confirm the public publisher/contact information and distribution settings. Preserve the existing item's identity so installed users receive the update.
