@@ -44,6 +44,11 @@ form.addEventListener('input', () => {
 });
 request('get').then(fill).catch(report);
 
+// Appearance applies at once and stays on this device, so it is not part of Save changes.
+const theme = $('theme');
+for (const input of theme.querySelectorAll('input')) input.checked = input.value === window.theme.get();
+theme.addEventListener('change', event => window.theme.set(event.target.value));
+
 async function refreshShortcuts() {
   try {
     const commands = await chrome.commands.getAll();

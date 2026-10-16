@@ -20,6 +20,15 @@ test('history and options are separate pages, and every local file they load exi
       assert.ok(existsSync(new URL(path, root)), `${page} loads missing ${path}`);
     }
   }
+  // Every script and stylesheet a page loads must also ship in the release zip.
+  const release = read('scripts/package-release.mjs');
+  for (const page of ['history.html', 'options.html', 'alert.html', 'privacy.html']) {
+    for (const [, path] of read(page).matchAll(/(?:src|href)="([^"#:]+\.(?:js|css))"/g)) {
+      assert.ok(release.includes(`'${path}'`), `${page} loads ${path}, which the release does not package`);
+    }
+    // Set before first paint, so a dark page never flashes white.
+    assert.ok(read(page).indexOf('<script src="theme.js"></script>') < read(page).indexOf('styles.css'), `${page} must load theme.js first`);
+  }
   assert.ok(read('history.html').includes('id="heat-grid"') && !read('history.html').includes('settings-form'));
   assert.ok(read('options.html').includes('id="settings-form"') && !read('options.html').includes('heat-grid'));
 });

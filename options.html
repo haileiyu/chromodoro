@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Settings · Chromodoro</title>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
+  <script src="theme.js"></script>
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="options.js"></script>
 </head>
@@ -41,6 +42,14 @@
         </fieldset>
         <div class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button id="save-settings" type="submit" class="button">Save changes</button></div>
       </form>
+      <section class="appearance-settings" aria-labelledby="appearance-heading">
+        <h2 id="appearance-heading">Appearance</h2>
+        <div class="setting-row"><span id="theme-label">Theme</span><span id="theme" class="segmented" role="radiogroup" aria-labelledby="theme-label">
+          <label><input type="radio" name="theme" value="system">System</label>
+          <label><input type="radio" name="theme" value="light">Light</label>
+          <label><input type="radio" name="theme" value="dark">Dark</label>
+        </span></div>
+      </section>
       <section class="shortcut-settings" aria-labelledby="shortcuts-heading">
         <h2 id="shortcuts-heading">Keyboard shortcuts</h2>
         <p class="muted">Work while Chrome is active. Each starts a new session, replacing any running or paused session. Start break takes a long break when one is due.</p>

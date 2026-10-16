@@ -14,7 +14,7 @@ test('shortcut defaults are Chrome-only with explicit Mac bindings', () => {
   }
 });
 
-function loadOptions({ commands = () => [], openTab = async () => {}, saveSettings = async () => {} } = {}) {
+function loadOptions({ commands = () => [], openTab = async () => {}, saveSettings = async () => {}, theme = 'system' } = {}) {
   const elements = new Map();
   const $ = id => {
     if (!elements.has(id)) elements.set(id, {
@@ -28,19 +28,34 @@ function loadOptions({ commands = () => [], openTab = async () => {}, saveSettin
   };
   const state = initialState();
   $('settings-form').elements = Object.fromEntries(Object.keys(state.settings).map(key => [key, {}]));
+  const themeInputs = ['system', 'light', 'dark'].map(value => ({ value, checked: false }));
+  $('theme').querySelectorAll = () => themeInputs;
+  const themeChoices = [];
   const errors = [], handlers = {};
   const source = readFileSync(new URL('../options.js', import.meta.url), 'utf8');
   runInNewContext(source.replace(/^import .*;\n/gm, ''), {
     $, ALERTS, report: error => errors.push(error),
     request: async (type, payload) => type === 'settings' ? saveSettings(payload) : state,
     chrome: { commands: { getAll: async () => commands() }, tabs: { create: openTab } },
-    window: { addEventListener: (type, fn) => { if (type === 'focus') handlers.focus = fn; } },
+    window: {
+      addEventListener: (type, fn) => { if (type === 'focus') handlers.focus = fn; },
+      theme: { get: () => theme, set: value => themeChoices.push(value) }
+    },
     document: { hidden: false, addEventListener: (type, fn) => { if (type === 'visibilitychange') handlers.visibility = fn; } }
   });
-  return { $, errors, handlers };
+  return { $, errors, handlers, themeInputs, themeChoices };
 }
 
 const settled = () => new Promise(resolve => setImmediate(resolve));
+
+test('appearance shows the saved theme and applies a new one at once', () => {
+  const { $, themeInputs, themeChoices } = loadOptions({ theme: 'dark' });
+  assert.deepEqual(themeInputs.filter(input => input.checked).map(input => input.value), ['dark']);
+  $('theme').listeners.change({ target: { value: 'light' } });
+  assert.deepEqual(themeChoices, ['light']);
+  // Theme is not a form setting, so it never marks Save as changed.
+  assert.equal($('save-settings').classes.has('primary'), false);
+});
 
 test('save is highlighted only while settings have unsaved changes', async () => {
   let failSave = false;

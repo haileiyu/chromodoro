@@ -34,13 +34,16 @@ http.createServer(async (request,response) => {
     if (pathname === '/store-fixture.js') {
       response.setHeader('Content-Type','text/javascript'); response.end(fixture); return;
     }
+    // Store assets are light, even when this Mac is in dark mode or the theme is set to dark.
+    if (pathname === '/theme.js') {
+      response.setHeader('Content-Type','text/javascript');
+      response.end("document.documentElement.dataset.theme='light';window.theme={get:()=>'light',set(){}};"); return;
+    }
     const relative = pathname.slice(1);
     if (!/^(?:[a-z-]+\.(?:html|js|css)|icons\/icon\d+\.png|store\/(?:promo|history-screenshot|settings-screenshot)\.html)$/.test(relative)) {
       response.writeHead(404); response.end(); return;
     }
     let body = await readFile(join(root, relative));
-    // Store assets are light. Pin the pages to it even when this Mac is in dark mode.
-    if (relative === 'styles.css') body = body.toString().replace('color-scheme: light dark;', 'color-scheme: only light;').replace('@media (prefers-color-scheme: dark)', '@media not all');
     response.setHeader('Content-Type', {'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.gs':'text/plain'}[extname(relative)]);
     if (['history.html','options.html','alert.html'].includes(relative)) {
       const page = relative.replace('.html','');
