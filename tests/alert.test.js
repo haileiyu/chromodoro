@@ -34,12 +34,12 @@ test('completion page shows daily goal progress, live changes, and midnight roll
   const text = () => element('today-total').textContent;
   const update = () => onStorage({ state: { newValue: structuredClone(state) } }, 'local');
   assert.equal(text(), '5/10'); // Includes the session that just finished.
-  assert.equal(element('headline').textContent, 'Focus complete');
+  assert.equal(element('headline').textContent, 'focus complete');
   toggle(state, now, 'break');
   now = state.timer.endsAt;
   settle(state, now);
   update();
-  assert.equal(element('headline').textContent, 'Break complete');
+  assert.equal(element('headline').textContent, 'break complete');
   assert.equal(text(), '5/10'); // Breaks do not advance the goal.
   state.days[dayKey(now)] = { count: 11, minutes: 275 };
   update();

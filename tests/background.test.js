@@ -209,7 +209,7 @@ test('toolbar, restart recovery, concurrent alarms, reset, and settings integrat
     await import(`../background.js?first=${Math.random()}`);
     h.chrome.runtime.onInstalled.fire();
     await h.message({ type: 'get' });
-    assert.deepEqual([...h.menus.values()].map(item => item.title), ['Start focusing', 'Start break', 'Pomodoro history']);
+    assert.deepEqual([...h.menus.values()].map(item => item.title), ['start focusing', 'start break', 'pomodoro history']);
     // History is its own page; settings stay on the options page Chrome links as Options.
     // openHistory is not on the state queue, so let its promises settle before looking.
     const settled = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -476,7 +476,7 @@ test('switched-off breaks are skipped without a phantom break, and cannot be sta
     // A switched-off break cannot be chosen; Start break falls back to the long break.
     result = await h.message({ type: 'phase', phase: 'shortBreak' });
     assert.equal(result.ok, false);
-    assert.match(result.error, /Short break is turned off/);
+    assert.match(result.error, /short break is turned off/);
     result = await h.message({ type: 'startBreak' });
     assert.equal(result.state.timer.phase, 'longBreak');
 

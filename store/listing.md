@@ -9,10 +9,10 @@ The repository is at version `1.3.0`. The public listing showed 1.2.0 on October
 Release notes are in [`RELEASE_NOTES.md`](RELEASE_NOTES.md). Follow [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) for the prepared files, verification results, and remaining store checks. This is a prepared release, not a confirmation of submission or publication.
 
 ## Name
-Chromodoro — Pomodoro Timer
+chromodoro — pomodoro timer
 
 ## Short description (manifest)
-One-click focus timer, remaining minutes on your toolbar, and private daily Pomodoro stats.
+one-click focus timer, remaining minutes on your toolbar, and private daily pomodoro stats.
 
 ## Detailed description
 Start a focus session with one click. Chromodoro keeps the remaining minutes on your Chrome toolbar, so you can focus without keeping a timer tab open.

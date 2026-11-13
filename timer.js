@@ -1,6 +1,6 @@
 export const DEFAULTS = Object.freeze({ focus: 25, shortBreak: 5, longBreak: 15, longEvery: 4, dailyTarget: 0, notify: true, newTab: true });
 export const ALERTS = Object.freeze(['notify', 'newTab']);
-export const LABELS = Object.freeze({ focus: 'Focus', shortBreak: 'Short break', longBreak: 'Long break' });
+export const LABELS = Object.freeze({ focus: 'focus', shortBreak: 'short break', longBreak: 'long break' });
 
 export function dayKey(time = Date.now()) {
   const d = new Date(time);
@@ -106,25 +106,25 @@ export function validateSettings(input) {
   const result = {};
   // Breaks may be 0 to switch them off. Focus and longEvery may not: a 0-minute focus
   // session means nothing, and cycle % 0 is NaN, so no long break would ever come.
-  for (const [key, min, max] of [['focus', 1, 180], ['shortBreak', 0, 60], ['longBreak', 0, 90], ['longEvery', 1, 12]]) {
+  for (const [key, name, min, max] of [['focus', 'focus', 1, 180], ['shortBreak', 'short break', 0, 60], ['longBreak', 'long break', 0, 90], ['longEvery', 'long break every', 1, 12]]) {
     const n = Number(input[key]);
-    if (!Number.isInteger(n) || n < min || n > max) throw new Error(`${key} must be a whole number between ${min} and ${max}.`);
+    if (!Number.isInteger(n) || n < min || n > max) throw new Error(`${name} must be a whole number between ${min} and ${max}.`);
     result[key] = n;
   }
   for (const key of ALERTS) {
-    if (typeof input[key] !== 'boolean') throw new Error('Choose what happens when a session ends.');
+    if (typeof input[key] !== 'boolean') throw new Error('choose what happens when a session ends.');
     result[key] = input[key];
   }
   const target = Number(input.dailyTarget);
-  if (!Number.isInteger(target) || target < 0 || target > 100) throw new Error('Daily target must be a whole number between 0 and 100.');
+  if (!Number.isInteger(target) || target < 0 || target > 100) throw new Error('daily target must be a whole number between 0 and 100.');
   result.dailyTarget = target;
   return result;
 }
 
 export function badge(state, now = Date.now()) {
   const t = state.timer;
-  if (!t) return { text: '', color: '#77736B', title: `Chromodoro · Click to start ${LABELS[state.nextPhase].toLowerCase()}. Right-click for stats.` };
+  if (!t) return { text: '', color: '#77736B', title: `chromodoro · click to start ${LABELS[state.nextPhase]}. right-click for stats.` };
   const minutes = Math.max(1, Math.ceil(remainingMs(t, now) / 60000));
   const paused = t.status === 'paused';
-  return { text: `${minutes}m`, color: paused ? '#77736B' : t.phase === 'focus' ? '#D52B1E' : '#3B7F32', title: `Chromodoro · ${LABELS[t.phase]} · ${minutes} min left${paused ? ' (paused)' : ''}. Click to ${paused ? 'resume' : 'pause'}. Right-click for stats.` };
+  return { text: `${minutes}m`, color: paused ? '#77736B' : t.phase === 'focus' ? '#D52B1E' : '#3B7F32', title: `chromodoro · ${LABELS[t.phase]} · ${minutes} min left${paused ? ' (paused)' : ''}. click to ${paused ? 'resume' : 'pause'}. right-click for stats.` };
 }

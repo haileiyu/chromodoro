@@ -61,11 +61,11 @@ async function announce(state, completion) {
     try {
       await chrome.notifications.create(`chromodoro-${completion.id}`, {
         type: 'basic', iconUrl: 'icons/icon128.png',
-        title: focus ? 'Focus complete' : 'Break complete',
+        title: focus ? 'focus complete' : 'break complete',
         // With that break switched off, focus is queued next, not a break.
-        message: focus && state.nextPhase !== 'focus' ? 'Your focus session is saved. Click the Chromodoro icon to start your break.'
-          : focus ? 'Your focus session is saved. Click the Chromodoro icon to start your next focus session.'
-          : 'Click the Chromodoro icon to start your next focus session.'
+        message: focus && state.nextPhase !== 'focus' ? 'your focus session is saved. click the chromodoro icon to start your break.'
+          : focus ? 'your focus session is saved. click the chromodoro icon to start your next focus session.'
+          : 'click the chromodoro icon to start your next focus session.'
       });
     } catch (error) { console.warn('Notification unavailable:', error); }
   }
@@ -79,7 +79,7 @@ async function announce(state, completion) {
 
 async function setupMenus() {
   await chrome.contextMenus.removeAll();
-  for (const [id, title] of [['startFocus', 'Start focusing'], ['startBreak', 'Start break'], ['history', 'Pomodoro history']]) {
+  for (const [id, title] of [['startFocus', 'start focusing'], ['startBreak', 'start break'], ['history', 'pomodoro history']]) {
     await new Promise((resolve, reject) => {
       chrome.contextMenus.create({ id, title, contexts: ['action'] }, () => {
         const error = chrome.runtime.lastError;
@@ -154,9 +154,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'startFocus') startFocus(state);
     if (message.type === 'startBreak') startBreak(state);
     if (message.type === 'phase') {
-      if (state.timer) throw new Error('Reset the current timer before changing sessions.');
-      if (!Object.hasOwn(LABELS, message.phase)) throw new Error('Unknown session type.');
-      if (!(state.settings[message.phase] > 0)) throw new Error(`${LABELS[message.phase]} is turned off in Settings.`);
+      if (state.timer) throw new Error('reset the current timer before changing sessions.');
+      if (!Object.hasOwn(LABELS, message.phase)) throw new Error('unknown session type.');
+      if (!(state.settings[message.phase] > 0)) throw new Error(`${LABELS[message.phase]} is turned off in settings.`);
       state.nextPhase = message.phase;
       state.lastCompletion = null;
     }

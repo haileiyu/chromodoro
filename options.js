@@ -32,7 +32,7 @@ form.addEventListener('submit', async event => {
   try {
     await request('settings', { settings });
     saved = JSON.stringify(settings);
-    $('save-status').textContent = 'Saved';
+    $('save-status').textContent = 'saved';
   } catch (error) { report(error); } finally {
     button.disabled = false;
     markChanges();
@@ -53,11 +53,11 @@ async function refreshShortcuts() {
   try {
     const commands = await chrome.commands.getAll();
     for (const [name, id] of [['startFocus', 'shortcut-focus'], ['startBreak', 'shortcut-break']]) {
-      $(id).textContent = commands.find(command => command.name === name)?.shortcut || 'Not assigned';
+      $(id).textContent = commands.find(command => command.name === name)?.shortcut.toLowerCase() || 'not assigned';
     }
   } catch {
-    $('shortcut-focus').textContent = 'Unavailable';
-    $('shortcut-break').textContent = 'Unavailable';
+    $('shortcut-focus').textContent = 'unavailable';
+    $('shortcut-break').textContent = 'unavailable';
   }
 }
 
@@ -66,7 +66,7 @@ $('customize-shortcuts').addEventListener('click', async () => {
   try {
     await chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
   } catch {
-    $('shortcut-error').textContent = 'Open chrome://extensions/shortcuts in Chrome to customize your shortcuts.';
+    $('shortcut-error').textContent = 'open chrome://extensions/shortcuts in chrome to customize your shortcuts.';
     $('shortcut-error').hidden = false;
   }
 });

@@ -79,7 +79,7 @@ test('save is highlighted only while settings have unsaved changes', async () =>
   failSave = false;
   await form.listeners.submit({ preventDefault() {} });
   assert.equal(save.classes.has('primary'), false);
-  assert.equal($('save-status').textContent, 'Saved');
+  assert.equal($('save-status').textContent, 'saved');
 });
 
 test('settings shows live bindings, refreshes after editing, and opens customization', async () => {
@@ -92,24 +92,24 @@ test('settings shows live bindings, refreshes after editing, and opens customiza
   });
   const onFocus = () => handlers.focus(), onVisibility = () => handlers.visibility();
   await settled();
-  assert.equal($('shortcut-focus').textContent, 'Alt+Shift+F');
-  assert.equal($('shortcut-break').textContent, 'Not assigned');
+  assert.equal($('shortcut-focus').textContent, 'alt+shift+f');
+  assert.equal($('shortcut-break').textContent, 'not assigned');
   assert.equal($('settings-form').elements.focus.value, 25);
   await $('customize-shortcuts').listeners.click();
   assert.deepEqual(opened, ['chrome://extensions/shortcuts']);
   commands = [{ name: 'startBreak', shortcut: 'Ctrl+Shift+B' }];
   onVisibility();
   await settled();
-  assert.equal($('shortcut-focus').textContent, 'Not assigned');
-  assert.equal($('shortcut-break').textContent, 'Ctrl+Shift+B');
+  assert.equal($('shortcut-focus').textContent, 'not assigned');
+  assert.equal($('shortcut-break').textContent, 'ctrl+shift+b');
 
   failRead = true;
   await onFocus();
-  assert.equal($('shortcut-focus').textContent, 'Unavailable');
-  assert.equal($('shortcut-break').textContent, 'Unavailable');
+  assert.equal($('shortcut-focus').textContent, 'unavailable');
+  assert.equal($('shortcut-break').textContent, 'unavailable');
   failRead = false;
   await onFocus();
-  assert.equal($('shortcut-break').textContent, 'Ctrl+Shift+B');
+  assert.equal($('shortcut-break').textContent, 'ctrl+shift+b');
   failOpen = true;
   await $('customize-shortcuts').listeners.click();
   assert.equal($('shortcut-error').hidden, false);

@@ -3,65 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Settings · Chromodoro</title>
+  <title>settings · chromodoro</title>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/icon32.png">
   <script src="theme.js"></script>
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="options.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">skip to content</a>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="history.html" aria-label="Chromodoro home"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4M12 7v5l3 2M18 5l2 2"/><circle cx="12" cy="14" r="8"/></svg>chromodoro</a>
-      <nav class="page-nav" aria-label="Main navigation">
-        <a href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-6M12 20V4M19 20V9"/></svg>History</a>
-        <a href="options.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h8m4 0h4M4 17h3m4 0h9"/><circle cx="14" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>Settings</a>
+      <a class="brand" href="history.html" aria-label="chromodoro home"><svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4M12 7v5l3 2M18 5l2 2"/><circle cx="12" cy="14" r="8"/></svg>chromodoro</a>
+      <nav class="page-nav" aria-label="main navigation">
+        <a href="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-6M12 20V4M19 20V9"/></svg>history</a>
+        <a href="options.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h8m4 0h4M4 17h3m4 0h9"/><circle cx="14" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>settings</a>
       </nav>
     </aside>
     <main id="main" class="page-content">
-      <header class="page-heading"><h1>Settings</h1></header>
+      <header class="page-heading"><h1>settings</h1></header>
       <form id="settings-form" class="settings-form">
         <fieldset>
-          <legend>Session length</legend>
-          <div class="setting-row"><label for="focus">Focus</label><span class="input-wrap"><input id="focus" name="focus" type="number" min="1" max="180" required value="25" aria-describedby="focus-unit"><span id="focus-unit">min</span></span></div>
-          <div class="setting-row"><label for="short-break">Short break</label><span class="input-wrap"><input id="short-break" name="shortBreak" type="number" min="0" max="60" required value="5" aria-describedby="short-unit break-help"><span id="short-unit">min</span></span></div>
-          <div class="setting-row"><label for="long-break">Long break</label><span class="input-wrap"><input id="long-break" name="longBreak" type="number" min="0" max="90" required value="15" aria-describedby="long-unit break-help"><span id="long-unit">min</span></span></div>
-          <div class="setting-row"><label for="long-every">Long break every</label><span class="input-wrap"><input id="long-every" name="longEvery" type="number" min="1" max="12" required value="4" aria-describedby="every-unit"><span id="every-unit">sessions</span></span></div>
-          <p id="break-help" class="muted">Set a break to 0 to skip it.</p>
+          <legend>session length</legend>
+          <div class="setting-row"><label for="focus">focus</label><span class="input-wrap"><input id="focus" name="focus" type="number" min="1" max="180" required value="25" aria-describedby="focus-unit"><span id="focus-unit">min</span></span></div>
+          <div class="setting-row"><label for="short-break">short break</label><span class="input-wrap"><input id="short-break" name="shortBreak" type="number" min="0" max="60" required value="5" aria-describedby="short-unit break-help"><span id="short-unit">min</span></span></div>
+          <div class="setting-row"><label for="long-break">long break</label><span class="input-wrap"><input id="long-break" name="longBreak" type="number" min="0" max="90" required value="15" aria-describedby="long-unit break-help"><span id="long-unit">min</span></span></div>
+          <div class="setting-row"><label for="long-every">long break every</label><span class="input-wrap"><input id="long-every" name="longEvery" type="number" min="1" max="12" required value="4" aria-describedby="every-unit"><span id="every-unit">sessions</span></span></div>
+          <p id="break-help" class="muted">set a break to 0 to skip it.</p>
         </fieldset>
         <fieldset class="goal-settings">
-          <legend>Daily goal</legend>
-          <div class="setting-row"><label for="daily-target">Pomodoro target</label><span class="input-wrap"><input id="daily-target" name="dailyTarget" type="number" min="0" max="100" step="1" required value="0" aria-describedby="target-unit target-help"><span id="target-unit">sessions</span></span></div>
-          <p id="target-help" class="muted">Set to 0 for no target.</p>
+          <legend>daily goal</legend>
+          <div class="setting-row"><label for="daily-target">pomodoro target</label><span class="input-wrap"><input id="daily-target" name="dailyTarget" type="number" min="0" max="100" step="1" required value="0" aria-describedby="target-unit target-help"><span id="target-unit">sessions</span></span></div>
+          <p id="target-help" class="muted">set to 0 for no target.</p>
         </fieldset>
         <fieldset class="notification-settings">
-          <legend>When a session ends</legend>
-          <label class="setting-row toggle-row" for="notify"><span>Show a notification</span><input class="toggle" id="notify" name="notify" type="checkbox" role="switch"></label>
-          <label class="setting-row toggle-row" for="new-tab"><span>Open a new tab</span><input class="toggle" id="new-tab" name="newTab" type="checkbox" role="switch"></label>
+          <legend>when a session ends</legend>
+          <label class="setting-row toggle-row" for="notify"><span>show a notification</span><input class="toggle" id="notify" name="notify" type="checkbox" role="switch"></label>
+          <label class="setting-row toggle-row" for="new-tab"><span>open a new tab</span><input class="toggle" id="new-tab" name="newTab" type="checkbox" role="switch"></label>
         </fieldset>
-        <div class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button id="save-settings" type="submit" class="button">Save changes</button></div>
+        <div class="settings-actions"><span id="save-status" role="status" class="save-status"></span><button id="save-settings" type="submit" class="button">save changes</button></div>
       </form>
       <section class="appearance-settings" aria-labelledby="appearance-heading">
-        <h2 id="appearance-heading">Appearance</h2>
-        <div class="setting-row"><span id="theme-label">Theme</span><span id="theme" class="segmented" role="radiogroup" aria-labelledby="theme-label">
-          <label><input type="radio" name="theme" value="system">System</label>
-          <label><input type="radio" name="theme" value="light">Light</label>
-          <label><input type="radio" name="theme" value="dark">Dark</label>
+        <h2 id="appearance-heading">appearance</h2>
+        <div class="setting-row"><span id="theme-label">theme</span><span id="theme" class="segmented" role="radiogroup" aria-labelledby="theme-label">
+          <label><input type="radio" name="theme" value="system">system</label>
+          <label><input type="radio" name="theme" value="light">light</label>
+          <label><input type="radio" name="theme" value="dark">dark</label>
         </span></div>
       </section>
       <section class="shortcut-settings" aria-labelledby="shortcuts-heading">
-        <h2 id="shortcuts-heading">Keyboard shortcuts</h2>
-        <p class="muted">Work while Chrome is active. Each starts a new session, replacing any running or paused session. Start break takes a long break when one is due.</p>
+        <h2 id="shortcuts-heading">keyboard shortcuts</h2>
+        <p class="muted">work while chrome is active. each starts a new session, replacing any running or paused session. start break takes a long break when one is due.</p>
         <dl class="shortcut-list" aria-live="polite">
-          <div class="setting-row"><dt>Start focusing</dt><dd id="shortcut-focus">Loading…</dd></div>
-          <div class="setting-row"><dt>Start break</dt><dd id="shortcut-break">Loading…</dd></div>
+          <div class="setting-row"><dt>start focusing</dt><dd id="shortcut-focus">loading…</dd></div>
+          <div class="setting-row"><dt>start break</dt><dd id="shortcut-break">loading…</dd></div>
         </dl>
-        <p class="muted">If a shortcut is unassigned or conflicts with another app, choose different keys in Chrome.</p>
-        <div class="settings-actions"><button id="customize-shortcuts" type="button" class="button">Customize shortcuts</button></div>
+        <p class="muted">if a shortcut is unassigned or conflicts with another app, choose different keys in chrome.</p>
+        <div class="settings-actions"><button id="customize-shortcuts" type="button" class="button">customize shortcuts</button></div>
         <p id="shortcut-error" role="status" class="muted" hidden></p>
       </section>
-      <p class="privacy-link"><a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>
+      <p class="privacy-link"><a href="privacy.html" target="_blank" rel="noopener noreferrer">privacy policy</a></p>
       <p id="error" role="alert" hidden></p>
     </main>
   </div>

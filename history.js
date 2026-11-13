@@ -13,7 +13,7 @@ async function load() {
 }
 
 function monthLabel(date) {
-  return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+  return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }).toLowerCase();
 }
 
 function minutesLabel(value) {
@@ -35,7 +35,7 @@ function buildHeatmap() {
     if (week === 0 && sunday.getDate() > 1) continue;
     const label = document.createElement('span');
     label.style.gridColumn = `${week + 2} / span ${Math.min(5, 53 - week)}`;
-    label.textContent = sunday.toLocaleDateString(undefined, { month: 'short' });
+    label.textContent = sunday.toLocaleDateString(undefined, { month: 'short' }).toLowerCase();
     months.push(label);
   }
   $('heat-months').replaceChildren(...months);
@@ -47,7 +47,7 @@ function buildHeatmap() {
       const name = document.createElement('span');
       name.className = 'heat-day';
       name.style.gridRow = weekday + 1;
-      name.textContent = days[weekday].toLocaleDateString(undefined, { weekday: 'short' });
+      name.textContent = days[weekday].toLocaleDateString(undefined, { weekday: 'short' }).toLowerCase();
       name.setAttribute('aria-hidden', 'true');
       row.append(name);
     }
@@ -74,13 +74,13 @@ function renderHeatmap() {
   const todayCount = state.days[dayKey()]?.count ?? 0;
   const target = state.settings.dailyTarget;
   $('today-total').textContent = target ? `${todayCount.toLocaleString()}/${target.toLocaleString()}` : todayCount.toLocaleString();
-  $('today-total-label').textContent = `completed Pomodoro${todayCount === 1 ? '' : 's'}`;
+  $('today-total-label').textContent = `completed pomodoro${todayCount === 1 ? '' : 's'}`;
   const status = state.historySync?.status;
   $('sync-status').textContent = status === 'ready'
-    ? 'Ready for Chrome sync. Chrome controls when changes reach your other devices.'
+    ? 'ready for chrome sync. chrome controls when changes reach your other devices.'
     : status === 'limited'
-      ? 'Chrome’s sync storage is full. Your history is saved on this device; sharing will retry automatically.'
-      : 'History is saved on this device. Sync is waiting and will retry automatically.';
+      ? 'chrome’s sync storage is full. your history is saved on this device; sharing will retry automatically.'
+      : 'history is saved on this device. sync is waiting and will retry automatically.';
   if (heatBuiltFor !== dayKey()) buildHeatmap();
   // Days before the first recorded one stay blank: a new install should not open on a
   // year of misses, and those squares are not data a screen reader should walk through.
@@ -100,10 +100,10 @@ function renderHeatmap() {
       for (const attribute of ['role', 'tabindex', 'title', 'aria-label']) cell.removeAttribute(attribute);
       return;
     }
-    const when = heatDates[i].toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const when = heatDates[i].toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).toLowerCase();
     const label = count
-      ? `${when} — ${count} Pomodoro${count === 1 ? '' : 's'} · ${minutesLabel(day.minutes)} of focus`
-      : `${when} — no Pomodoros`;
+      ? `${when} — ${count} pomodoro${count === 1 ? '' : 's'} · ${minutesLabel(day.minutes)} of focus`
+      : `${when} — no pomodoros`;
     cell.className = `sq l${heatmapLevel(count)}`;
     cell.removeAttribute('aria-hidden');
     cell.setAttribute('role', 'gridcell');
@@ -116,7 +116,7 @@ function renderHeatmap() {
   const stop = anchor && !anchor.hasAttribute('aria-hidden') ? anchor : latest;
   if (stop) stop.tabIndex = 0;
   $('heat-total').textContent = total.toLocaleString();
-  $('heat-total-label').textContent = `completed Pomodoro${total === 1 ? '' : 's'}`;
+  $('heat-total-label').textContent = `completed pomodoro${total === 1 ? '' : 's'}`;
   $('heat-empty').hidden = Boolean(first);
 }
 

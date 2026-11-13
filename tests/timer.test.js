@@ -81,11 +81,11 @@ test('rejects invalid settings including fractions and extreme durations', () =>
 
 test('breaks accept 0 while focus and longEvery still need at least 1', () => {
   assert.deepEqual(validateSettings({ ...DEFAULTS, shortBreak: 0, longBreak: 0 }), { ...DEFAULTS, shortBreak: 0, longBreak: 0 });
-  for (const key of ['shortBreak', 'longBreak']) {
-    for (const value of [-1, 0.5, 'off']) assert.throws(() => validateSettings({ ...DEFAULTS, [key]: value }), new RegExp(`${key} must be a whole number between 0 and`));
+  for (const [key, name] of [['shortBreak', 'short break'], ['longBreak', 'long break']]) {
+    for (const value of [-1, 0.5, 'off']) assert.throws(() => validateSettings({ ...DEFAULTS, [key]: value }), new RegExp(`^Error: ${name} must be a whole number between 0 and`));
   }
-  for (const key of ['focus', 'longEvery']) {
-    assert.throws(() => validateSettings({ ...DEFAULTS, [key]: 0 }), new RegExp(`${key} must be a whole number between 1 and`));
+  for (const [key, name] of [['focus', 'focus'], ['longEvery', 'long break every']]) {
+    assert.throws(() => validateSettings({ ...DEFAULTS, [key]: 0 }), new RegExp(`^Error: ${name} must be a whole number between 1 and`));
   }
 });
 
@@ -139,7 +139,7 @@ test('daily targets are optional, validated, and migrated without changing saved
     assert.equal(migrate(JSON.parse(JSON.stringify(state))).settings.dailyTarget, dailyTarget);
   }
   for (const dailyTarget of [-1, 1.5, 101, Infinity, 'invalid', undefined]) {
-    assert.throws(() => validateSettings({ ...state.settings, dailyTarget }), /Daily target/);
+    assert.throws(() => validateSettings({ ...state.settings, dailyTarget }), /daily target/);
   }
 });
 

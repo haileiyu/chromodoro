@@ -8,12 +8,12 @@ function renderToday() {
   const count = currentState.days[dayKey()]?.count ?? 0;
   const target = currentState.settings.dailyTarget;
   $('today-total').textContent = target ? `${count.toLocaleString()}/${target.toLocaleString()}` : count.toLocaleString();
-  $('today-total-label').textContent = `Pomodoro${count === 1 ? '' : 's'} completed today`;
+  $('today-total-label').textContent = `pomodoro${count === 1 ? '' : 's'} completed today`;
 }
 
 async function request(type) {
   const response = await chrome.runtime.sendMessage({ type });
-  if (!response?.ok) throw new Error(response?.error || 'The extension is unavailable.');
+  if (!response?.ok) throw new Error(response?.error || 'the extension is unavailable.');
   return response.state;
 }
 
@@ -22,10 +22,10 @@ function render(state) {
   renderToday();
   const done = state.lastCompletion;
   const focus = done?.phase === 'focus';
-  $('headline').textContent = !done ? 'Timer idle' : focus ? 'Focus complete' : 'Break complete';
+  $('headline').textContent = !done ? 'timer idle' : focus ? 'focus complete' : 'break complete';
   $('detail').textContent = done ? `${done.minutes} minutes` : '';
   const next = state.nextPhase;
-  $('primary').textContent = `Start ${LABELS[next].toLowerCase()}`;
+  $('primary').textContent = `start ${LABELS[next]}`;
   $('primary').disabled = false;
   // Only worth offering when the queued phase is a break we could skip past.
   $('secondary').hidden = next === 'focus';
@@ -38,7 +38,7 @@ async function act(button, type) {
     window.close();
   } catch (error) {
     button.disabled = false;
-    $('detail').textContent = error.message;
+    $('detail').textContent = error.message.toLowerCase();
   }
 }
 
@@ -56,4 +56,4 @@ setInterval(renderToday, 30000);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) renderToday();
 });
-request('get').then(render).catch(error => { $('detail').textContent = error.message; });
+request('get').then(render).catch(error => { $('detail').textContent = error.message.toLowerCase(); });
